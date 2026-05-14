@@ -12,9 +12,7 @@ export default function Dashboard() {
   const [stats, setStats] = useState<Stats>({ totalUsers: 0, presentToday: 0, totalLocations: 0, recordsToday: 0 });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadStats();
-  }, []);
+  useEffect(() => { loadStats(); }, []);
 
   const loadStats = async () => {
     try {
@@ -52,125 +50,207 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-center">
-          <div className="spinner mx-auto mb-4"></div>
-          <p className="text-on-surface-variant font-medium mt-4">Carregando dados...</p>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div className="spinner" style={{ margin: '0 auto 16px' }}></div>
+          <p className="font-body-sm text-body-sm text-on-surface-variant" style={{ marginTop: 16 }}>Carregando dados...</p>
         </div>
       </div>
     );
   }
 
+  const attendanceRate = stats.totalUsers > 0 ? Math.round((stats.presentToday / stats.totalUsers) * 100) : 0;
+
   return (
-    <div className="max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-primary mb-2">Dashboard</h1>
-        <p className="text-on-surface-variant">Visão geral do sistema de presença</p>
+    <div className="animate-fade-in">
+      {/* Page Title */}
+      <div style={{ marginBottom: 32 }}>
+        <h1 className="font-headline-md text-headline-md text-primary" style={{ marginBottom: 4 }}>Painel do Administrador</h1>
+        <p className="font-body-sm text-body-sm text-on-surface-variant">Visão geral do sistema de presença em tempo real</p>
       </div>
 
-      {/* Stats Grid - Bento Style */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <StatCard 
-          title="Total de Usuários" 
-          value={stats.totalUsers} 
-          icon={
-            <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-          }
-          gradient="from-primary to-primary-container"
-        />
-        <StatCard 
-          title="Presentes Hoje" 
-          value={stats.presentToday} 
-          icon={
-            <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          }
-          gradient="from-secondary to-green-700"
-          highlight
-        />
-        <StatCard 
-          title="Locais Cadastrados" 
-          value={stats.totalLocations} 
-          icon={
-            <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          }
-          gradient="from-tertiary-container to-tertiary"
-        />
-        <StatCard 
-          title="Registros Hoje" 
-          value={stats.recordsToday} 
-          icon={
-            <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-            </svg>
-          }
-          gradient="from-orange-500 to-orange-600"
-        />
-      </div>
-
-      {/* Summary Card */}
-      <div className="card mb-8">
-        <div className="flex items-start justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-bold text-primary mb-2">Resumo do Dia</h2>
-            <p className="text-on-surface-variant">Acompanhamento diário de presenças</p>
-          </div>
-          <div className="w-16 h-16 bg-gradient-to-br from-secondary to-green-700 rounded-xl flex items-center justify-center shadow-lg text-on-secondary">
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-          </div>
-        </div>
+      {/* Bento Grid Stats */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: 24, marginBottom: 32 }}>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
-            <div className="text-3xl font-bold text-secondary mb-1">{stats.presentToday}</div>
-            <div className="text-sm text-green-800 font-semibold">Usuários presentes</div>
+        {/* Taxa de Presença - Large */}
+        <div style={{
+          gridColumn: 'span 8',
+          background: 'var(--surface-container-lowest)',
+          borderRadius: 12,
+          padding: 32,
+          border: '1px solid var(--outline-variant)',
+          boxShadow: '0 2px 8px rgba(0,30,64,0.06)',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 24 }}>
+            <div>
+              <p className="font-label-caps text-label-caps text-on-surface-variant" style={{ marginBottom: 8 }}>TAXA DE PRESENÇA HOJE</p>
+              <h2 className="font-display-lg text-display-lg text-primary">{attendanceRate}%</h2>
+            </div>
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              background: 'var(--secondary-container)', color: 'var(--on-secondary-container)',
+              padding: '4px 12px', borderRadius: 9999, fontSize: 12, fontWeight: 700
+            }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>trending_up</span>
+              Atualizado agora
+            </span>
           </div>
-          <div className="bg-gradient-to-br from-primary-fixed/30 to-primary-fixed/10 rounded-xl p-6 border border-primary-fixed">
-            <div className="text-3xl font-bold text-primary mb-1">{stats.recordsToday}</div>
-            <div className="text-sm text-primary font-semibold">Registros hoje</div>
+
+          {/* Mock Bar Chart */}
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 120, paddingTop: 16 }}>
+            {[85, 92, 88, 94, 96, 60, 40].map((h, i) => (
+              <div key={i} style={{
+                flex: 1,
+                height: `${h}%`,
+                background: i === 4 ? 'var(--primary)' : 'var(--surface-container-high)',
+                borderRadius: '4px 4px 0 0',
+                transition: 'background 0.2s',
+              }} />
+            ))}
           </div>
-          <div className="bg-gradient-to-br from-tertiary-fixed/30 to-tertiary-fixed/10 rounded-xl p-6 border border-tertiary-fixed">
-            <div className="text-3xl font-bold text-tertiary mb-1">{stats.totalLocations}</div>
-            <div className="text-sm text-tertiary font-semibold">Locais ativos</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
+            {['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'].map(d => (
+              <span key={d} className="font-label-bold text-label-bold text-on-surface-variant">{d}</span>
+            ))}
           </div>
         </div>
 
-        <p className="text-on-surface-variant mt-6 pt-6 border-t border-outline-variant">
-          <span className="font-semibold text-secondary">{stats.presentToday}</span> usuários presentes hoje, 
-          totalizando <span className="font-semibold text-secondary">{stats.recordsToday}</span> registros de ponto.
-        </p>
+        {/* Stats Stack */}
+        <div style={{ gridColumn: 'span 4', display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <StatMini
+            label="PRESENTES HOJE"
+            value={`${stats.presentToday} / ${stats.totalUsers}`}
+            icon="person_check"
+            iconBg="var(--primary-fixed)"
+            iconColor="var(--primary)"
+            valueColor="var(--primary)"
+          />
+          <StatMini
+            label="LOCAIS ATIVOS"
+            value={String(stats.totalLocations)}
+            icon="location_on"
+            iconBg="var(--tertiary-fixed)"
+            iconColor="var(--tertiary)"
+            valueColor="var(--tertiary)"
+          />
+          <StatMini
+            label="REGISTROS HOJE"
+            value={String(stats.recordsToday)}
+            icon="schedule"
+            iconBg="var(--error-container)"
+            iconColor="var(--error)"
+            valueColor="var(--error)"
+          />
+        </div>
+      </div>
+
+      {/* Bottom Bento Row */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+        {/* Total Colaboradores */}
+        <div style={{
+          background: 'var(--primary)',
+          color: 'var(--on-primary)',
+          borderRadius: 12,
+          padding: 24,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          minHeight: 160,
+        }}>
+          <div>
+            <span className="material-symbols-outlined" style={{ fontSize: 36, fontVariationSettings: "'FILL' 1", opacity: 0.8 }}>group_add</span>
+            <h4 className="font-headline-sm text-headline-sm" style={{ marginTop: 8 }}>Total de Colaboradores</h4>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: 24 }}>
+            <span className="font-display-lg text-display-lg">{stats.totalUsers}</span>
+            <span style={{
+              background: 'var(--primary-container)', color: 'var(--on-primary-container)',
+              padding: '4px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700
+            }}>Sistema</span>
+          </div>
+        </div>
+
+        {/* Presença */}
+        <div style={{
+          background: 'var(--surface-container-high)',
+          borderRadius: 12,
+          padding: 24,
+          border: '1px solid var(--outline-variant)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          minHeight: 160,
+        }}>
+          <div>
+            <span className="material-symbols-outlined text-primary" style={{ fontSize: 36 }}>how_to_reg</span>
+            <h4 className="font-headline-sm text-headline-sm text-primary" style={{ marginTop: 8 }}>Taxa de Presença</h4>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: 24 }}>
+            <span className="font-display-lg text-display-lg text-primary">{attendanceRate}%</span>
+            <div style={{ display: 'flex', gap: -8 }}>
+              {[1,2,3].map(i => (
+                <div key={i} style={{
+                  width: 28, height: 28, borderRadius: '50%',
+                  background: ['var(--surface-dim)','var(--surface-container-highest)','var(--primary-container)'][i-1],
+                  border: '2px solid var(--surface-container-high)',
+                  marginLeft: i > 1 ? -8 : 0,
+                }} />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Sessões Ativas */}
+        <div style={{
+          background: 'var(--secondary-container)',
+          color: 'var(--on-secondary-container)',
+          borderRadius: 12,
+          padding: 24,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          minHeight: 160,
+        }}>
+          <div>
+            <span className="material-symbols-outlined" style={{ fontSize: 36 }}>verified_user</span>
+            <h4 className="font-headline-sm text-headline-sm" style={{ marginTop: 8 }}>Sessões Ativas</h4>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: 24 }}>
+            <span className="font-display-lg text-display-lg">{stats.presentToday}</span>
+            <span className="font-label-bold text-label-bold">Rastreamento ao Vivo</span>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-function StatCard({ title, value, icon, gradient, highlight = false }: any) {
+function StatMini({ label, value, icon, iconBg, iconColor, valueColor }: {
+  label: string; value: string; icon: string;
+  iconBg: string; iconColor: string; valueColor: string;
+}) {
   return (
-    <div className={`card ${highlight ? 'ring-2 ring-secondary ring-offset-2' : ''}`}>
-      <div className="flex items-center justify-between mb-4">
-        <div className={`w-14 h-14 bg-gradient-to-br ${gradient} rounded-xl flex items-center justify-center shadow-lg text-on-primary`}>
-          {icon}
-        </div>
-        {highlight && (
-          <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full flex items-center gap-1">
-            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z" clipRule="evenodd" />
-            </svg>
-            Atualizado
-          </span>
-        )}
+    <div style={{
+      background: 'var(--surface-container-lowest)',
+      borderRadius: 12,
+      padding: 16,
+      border: '1px solid var(--outline-variant)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      boxShadow: '0 2px 8px rgba(0,30,64,0.06)',
+      flex: 1,
+    }}>
+      <div>
+        <p className="font-label-caps text-label-caps text-on-surface-variant" style={{ marginBottom: 6 }}>{label}</p>
+        <h4 className="font-headline-md text-headline-md" style={{ color: valueColor }}>{value}</h4>
       </div>
-      <div className="text-3xl font-bold text-primary mb-1">{value}</div>
-      <div className="text-sm text-on-surface-variant font-medium">{title}</div>
+      <div style={{
+        background: iconBg, color: iconColor,
+        padding: 12, borderRadius: '50%', display: 'flex',
+      }}>
+        <span className="material-symbols-outlined">{icon}</span>
+      </div>
     </div>
   );
 }

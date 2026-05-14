@@ -14,15 +14,9 @@ export default function Users() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
-    email: '',
-    full_name: '',
-    role: 'user',
-  });
+  const [formData, setFormData] = useState({ email: '', full_name: '', role: 'user' });
 
-  useEffect(() => {
-    loadUsers();
-  }, []);
+  useEffect(() => { loadUsers(); }, []);
 
   const loadUsers = async () => {
     try {
@@ -30,7 +24,6 @@ export default function Users() {
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
-
       if (error) throw error;
       setUsers(data || []);
     } catch (error: any) {
@@ -44,18 +37,12 @@ export default function Users() {
     e.preventDefault();
     try {
       if (editingId) {
-        const { error } = await supabase
-          .from('profiles')
-          .update(formData)
-          .eq('id', editingId);
-
+        const { error } = await supabase.from('profiles').update(formData).eq('id', editingId);
         if (error) throw error;
       } else {
-        // Note: Creating users should be done via Supabase Auth
         alert('Para criar usuários, utilize a autenticação do Supabase');
         return;
       }
-
       resetForm();
       loadUsers();
     } catch (error: any) {
@@ -64,17 +51,13 @@ export default function Users() {
   };
 
   const handleEdit = (user: UserProfile) => {
-    setFormData({
-      full_name: user.full_name || '',
-      email: user.email || '',
-      role: user.role || 'user',
-    });
+    setFormData({ full_name: user.full_name || '', email: user.email || '', role: user.role || 'user' });
     setEditingId(user.id);
     setShowForm(true);
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Tem certeza que deseja excluir este usuário?')) {
+    if (confirm('Tem certeza que deseja excluir este colaborador?')) {
       try {
         const { error } = await supabase.from('profiles').delete().eq('id', id);
         if (error) throw error;
@@ -91,133 +74,124 @@ export default function Users() {
     setShowForm(false);
   };
 
+  const getInitials = (name: string, email: string) =>
+    name ? name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
+         : email?.charAt(0).toUpperCase() || 'U';
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-center">
-          <div className="spinner mx-auto mb-4"></div>
-          <p className="text-on-surface-variant font-medium mt-4">Carregando usuários...</p>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div className="spinner" style={{ margin: '0 auto 16px' }}></div>
+          <p className="font-body-sm text-body-sm text-on-surface-variant" style={{ marginTop: 16 }}>Carregando colaboradores...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="animate-fade-in">
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-primary mb-2">Colaboradores</h1>
-            <p className="text-on-surface-variant">Gerencie os usuários do sistema</p>
-          </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
+        <div>
+          <h1 className="font-headline-md text-headline-md text-primary" style={{ marginBottom: 4 }}>Gestão de Colaboradores</h1>
+          <p className="font-body-sm text-body-sm text-on-surface-variant">Gerencie sua força de trabalho, cargos e acesso institucional.</p>
+        </div>
+        <div style={{ display: 'flex', gap: 12 }}>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="btn-primary flex items-center gap-2"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 8,
+              background: showForm ? 'var(--surface-container-lowest)' : 'var(--primary)',
+              color: showForm ? 'var(--primary)' : 'var(--on-primary)',
+              border: showForm ? '1px solid var(--outline)' : 'none',
+              padding: '10px 20px', borderRadius: 8,
+              fontFamily: 'Inter', fontWeight: 600, fontSize: 12, letterSpacing: '0.05em',
+              cursor: 'pointer', transition: 'all 0.2s',
+            }}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            {showForm ? 'Cancelar' : 'Novo Usuário'}
+            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+              {showForm ? 'close' : 'person_add'}
+            </span>
+            {showForm ? 'Cancelar' : 'Adicionar Novo Colaborador'}
           </button>
         </div>
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="card flex items-center gap-4">
-          <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-2.02M21 21v-2a3 3 0 00-3-3h-1m-15 0a3 3 0 00-5.356 2.02M3 21v-2a3 3 0 003-3h1" />
-            </svg>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
+        {[
+          { label: 'TOTAL DE COLABORADORES', value: users.length, icon: 'group', color: 'var(--primary)', bg: 'var(--primary-fixed)' },
+          { label: 'ATIVOS', value: users.filter(u => u.role !== 'inactive').length, icon: 'how_to_reg', color: 'var(--secondary)', bg: 'rgba(0,108,73,0.1)' },
+          { label: 'ADMINISTRADORES', value: users.filter(u => u.role === 'admin').length, icon: 'manage_accounts', color: 'var(--tertiary)', bg: 'var(--tertiary-fixed)' },
+        ].map((stat) => (
+          <div key={stat.label} style={{
+            background: 'var(--surface-container-lowest)',
+            borderRadius: 12, padding: 16,
+            border: '1px solid var(--outline-variant)',
+            display: 'flex', alignItems: 'center', gap: 16,
+            boxShadow: '0 2px 8px rgba(0,30,64,0.06)',
+          }}>
+            <div style={{ background: stat.bg, color: stat.color, padding: 10, borderRadius: '50%', display: 'flex' }}>
+              <span className="material-symbols-outlined">{stat.icon}</span>
+            </div>
+            <div>
+              <p className="font-label-caps text-label-caps text-on-surface-variant">{stat.label}</p>
+              <p className="font-headline-sm text-headline-sm" style={{ color: stat.color }}>{stat.value}</p>
+            </div>
           </div>
-          <div>
-            <p className="text-xs font-bold text-on-surface-variant uppercase">Total de Usuários</p>
-            <p className="text-2xl font-bold text-primary">{users.length}</p>
-          </div>
-        </div>
-
-        <div className="card flex items-center gap-4">
-          <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center text-secondary">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div>
-            <p className="text-xs font-bold text-on-surface-variant uppercase">Ativos</p>
-            <p className="text-2xl font-bold text-secondary">{users.filter(u => u.role !== 'inactive').length}</p>
-          </div>
-        </div>
-
-        <div className="card flex items-center gap-4">
-          <div className="w-12 h-12 bg-tertiary-container/10 rounded-full flex items-center justify-center text-tertiary">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div>
-            <p className="text-xs font-bold text-on-surface-variant uppercase">Administradores</p>
-            <p className="text-2xl font-bold text-tertiary">{users.filter(u => u.role === 'admin').length}</p>
-          </div>
-        </div>
+        ))}
       </div>
 
       {/* Form */}
       {showForm && (
-        <div className="card mb-8 animate-fade-in">
-          <h2 className="text-2xl font-bold text-primary mb-6">
-            {editingId ? 'Editar Usuário' : 'Cadastrar Novo Usuário'}
+        <div className="animate-fade-in" style={{
+          background: 'var(--surface-container-lowest)',
+          borderRadius: 12, padding: 24,
+          border: '1px solid var(--outline-variant)',
+          marginBottom: 24,
+          boxShadow: '0 2px 8px rgba(0,30,64,0.06)',
+        }}>
+          <h2 className="font-headline-sm text-headline-sm text-primary" style={{ marginBottom: 24 }}>
+            {editingId ? 'Editar Colaborador' : 'Cadastrar Novo Colaborador'}
           </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16, marginBottom: 16 }}>
             <div>
-              <label className="block text-sm font-semibold text-on-surface-variant mb-2">Nome Completo</label>
-              <input
-                type="text"
-                value={formData.full_name}
+              <label className="font-label-bold text-label-bold text-on-surface-variant" style={{ display: 'block', marginBottom: 8 }}>Nome Completo</label>
+              <input type="text" value={formData.full_name}
                 onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                className="w-full"
-                placeholder="Ex: João Silva"
-                required
-              />
+                placeholder="Ex: João Silva" />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-on-surface-variant mb-2">Email</label>
-              <input
-                type="email"
-                value={formData.email}
+              <label className="font-label-bold text-label-bold text-on-surface-variant" style={{ display: 'block', marginBottom: 8 }}>Email</label>
+              <input type="email" value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full"
-                placeholder="exemplo@empresa.com"
-                required
-              />
+                placeholder="exemplo@empresa.com" />
             </div>
           </div>
-
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-on-surface-variant mb-2">Cargo/Função</label>
-            <input
-              type="text"
-              value={formData.role}
-              onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-              className="w-full"
-              placeholder="Ex: Administrador"
-            />
+          <div style={{ marginBottom: 16 }}>
+            <label className="font-label-bold text-label-bold text-on-surface-variant" style={{ display: 'block', marginBottom: 8 }}>Cargo / Função</label>
+            <select className="select-arrow" value={formData.role}
+              onChange={(e) => setFormData({ ...formData, role: e.target.value })}>
+              <option value="user">Colaborador</option>
+              <option value="admin">Administrador</option>
+            </select>
           </div>
-
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="btn-primary"
-            >
-              {editingId ? 'Atualizar Usuário' : 'Cadastrar Usuário'}
+          <div style={{ display: 'flex', gap: 12 }}>
+            <button onClick={handleSubmit} style={{
+              background: 'var(--primary)', color: 'var(--on-primary)',
+              padding: '10px 20px', borderRadius: 8, fontFamily: 'Inter', fontWeight: 600, fontSize: 12,
+              letterSpacing: '0.05em', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
+            }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>save</span>
+              {editingId ? 'Atualizar' : 'Cadastrar'}
             </button>
-            <button
-              type="button"
-              onClick={resetForm}
-              className="btn-secondary"
-            >
+            <button onClick={resetForm} style={{
+              background: 'var(--surface-container-lowest)', color: 'var(--on-surface)',
+              border: '1px solid var(--outline-variant)',
+              padding: '10px 20px', borderRadius: 8, fontFamily: 'Inter', fontWeight: 600, fontSize: 12,
+              letterSpacing: '0.05em', cursor: 'pointer',
+            }}>
               Cancelar
             </button>
           </div>
@@ -225,62 +199,99 @@ export default function Users() {
       )}
 
       {/* Table */}
-      <div className="card overflow-hidden p-0">
-        <div className="overflow-x-auto">
-          <table className="w-full">
+      <div style={{
+        background: 'var(--surface-container-lowest)',
+        borderRadius: 12,
+        border: '1px solid var(--outline-variant)',
+        boxShadow: '0 2px 8px rgba(0,30,64,0.06)',
+        overflow: 'hidden',
+      }}>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr className="bg-surface-container">
-                <th className="text-left px-6 py-4">Nome</th>
-                <th className="text-left px-6 py-4">Email</th>
-                <th className="text-left px-6 py-4">Cargo</th>
-                <th className="text-left px-6 py-4">Status</th>
-                <th className="text-left px-6 py-4">Ações</th>
+              <tr style={{ background: 'var(--surface-container-low)', borderBottom: '1px solid var(--outline-variant)' }}>
+                {['NOME', 'ID', 'CARGO', 'STATUS', 'AÇÕES'].map(h => (
+                  <th key={h} style={{
+                    padding: '12px 24px', textAlign: 'left',
+                    fontSize: 11, fontWeight: 700, letterSpacing: '0.1em',
+                    color: 'var(--on-surface-variant)', fontFamily: 'Inter',
+                  }}>{h}</th>
+                ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-outline-variant/30">
+            <tbody>
               {users.map((user) => (
-                <tr key={user.id} className="hover:bg-surface-container-lowest transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold">
-                        {user.full_name?.charAt(0) || user.email?.charAt(0) || 'U'}
+                <tr key={user.id} style={{ borderBottom: '1px solid rgba(195,198,209,0.3)', transition: 'background 0.15s' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-container-low)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                  <td style={{ padding: '14px 24px', borderLeft: `4px solid ${user.role === 'admin' ? 'var(--tertiary-fixed-dim)' : 'var(--secondary)'}` }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{
+                        width: 36, height: 36, borderRadius: '50%',
+                        background: 'var(--surface-container-high)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: 'var(--primary)', fontWeight: 700, fontSize: 13,
+                      }}>
+                        {getInitials(user.full_name, user.email)}
                       </div>
-                      <span className="font-semibold text-on-surface">{user.full_name || 'Usuário'}</span>
+                      <div>
+                        <p className="font-body-md text-body-md text-primary" style={{ fontWeight: 700 }}>{user.full_name || 'Usuário'}</p>
+                        <p className="font-body-sm text-body-sm text-on-surface-variant">{user.email}</p>
+                      </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-on-surface-variant">{user.email}</td>
-                  <td className="px-6 py-4 text-on-surface-variant">{user.role || 'user'}</td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-bold ${
-                      user.role === 'admin' 
-                        ? 'bg-tertiary-fixed text-tertiary' 
-                        : 'bg-secondary/10 text-secondary'
-                    }`}>
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      {user.role === 'admin' ? 'Admin' : 'Ativo'}
+                  <td style={{ padding: '14px 24px' }}>
+                    <span className="font-body-sm text-body-sm text-on-surface-variant">
+                      {user.id.slice(0, 8).toUpperCase()}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleEdit(user)}
-                        className="text-primary hover:text-primary-container p-2 hover:bg-primary-fixed rounded-lg transition-colors"
-                        title="Editar"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
+                  <td style={{ padding: '14px 24px' }}>
+                    <span className="font-body-sm text-body-sm text-on-surface-variant">
+                      {user.role === 'admin' ? 'Administrador' : 'Colaborador'}
+                    </span>
+                  </td>
+                  <td style={{ padding: '14px 24px' }}>
+                    {user.role === 'admin' ? (
+                      <span style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 4,
+                        background: 'var(--tertiary-fixed)', color: 'var(--tertiary)',
+                        border: '1px solid var(--tertiary-fixed-dim)',
+                        padding: '3px 10px', borderRadius: 9999, fontSize: 11, fontWeight: 700,
+                      }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: 13, fontVariationSettings: "'FILL' 1" }}>shield</span>
+                        Admin
+                      </span>
+                    ) : (
+                      <span style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 4,
+                        background: 'rgba(0,108,73,0.1)', color: 'var(--secondary)',
+                        border: '1px solid rgba(0,108,73,0.2)',
+                        padding: '3px 10px', borderRadius: 9999, fontSize: 11, fontWeight: 700,
+                      }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: 13, fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                        Ativo
+                      </span>
+                    )}
+                  </td>
+                  <td style={{ padding: '14px 24px' }}>
+                    <div style={{ display: 'flex', gap: 4 }}>
+                      <button onClick={() => handleEdit(user)} style={{
+                        padding: 6, borderRadius: 6, background: 'transparent',
+                        color: 'var(--primary)', cursor: 'pointer', display: 'flex',
+                        transition: 'background 0.15s',
+                      }}
+                        onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-container)')}
+                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                        <span className="material-symbols-outlined" style={{ fontSize: 20 }}>edit</span>
                       </button>
-                      <button
-                        onClick={() => handleDelete(user.id)}
-                        className="text-error hover:text-error-container p-2 hover:bg-error-container/20 rounded-lg transition-colors"
-                        title="Excluir"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
+                      <button onClick={() => handleDelete(user.id)} style={{
+                        padding: 6, borderRadius: 6, background: 'transparent',
+                        color: 'var(--on-surface-variant)', cursor: 'pointer', display: 'flex',
+                        transition: 'all 0.15s',
+                      }}
+                        onMouseEnter={e => { e.currentTarget.style.background = 'var(--error-container)'; e.currentTarget.style.color = 'var(--error)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--on-surface-variant)'; }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: 20 }}>delete</span>
                       </button>
                     </div>
                   </td>
@@ -291,12 +302,45 @@ export default function Users() {
         </div>
 
         {users.length === 0 && (
-          <div className="text-center py-12">
-            <svg className="w-16 h-16 text-outline-variant mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-            <p className="text-on-surface-variant font-medium">Nenhum usuário cadastrado</p>
-            <p className="text-on-surface-variant text-sm mt-1">Clique em "Novo Usuário" para cadastrar</p>
+          <div style={{ textAlign: 'center', padding: '48px 0' }}>
+            <span className="material-symbols-outlined text-on-surface-variant" style={{ fontSize: 48, display: 'block', marginBottom: 12 }}>group</span>
+            <p className="font-body-md text-body-md text-on-surface-variant" style={{ fontWeight: 600 }}>Nenhum colaborador cadastrado</p>
+            <p className="font-body-sm text-body-sm text-on-surface-variant" style={{ marginTop: 4 }}>Clique em "Adicionar Novo Colaborador" para começar</p>
+          </div>
+        )}
+
+        {/* Pagination Footer */}
+        {users.length > 0 && (
+          <div style={{
+            background: 'var(--surface-container-low)',
+            padding: '12px 24px',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            borderTop: '1px solid var(--outline-variant)',
+          }}>
+            <span className="font-body-sm text-body-sm text-on-surface-variant">
+              Exibindo 1 a {users.length} de {users.length} registros
+            </span>
+            <div style={{ display: 'flex', gap: 4 }}>
+              <button style={{
+                padding: 4, border: '1px solid var(--outline-variant)',
+                background: 'var(--surface-container-lowest)', borderRadius: 4,
+                color: 'var(--on-surface-variant)', opacity: 0.5, cursor: 'default', display: 'flex',
+              }}>
+                <span className="material-symbols-outlined">chevron_left</span>
+              </button>
+              <button style={{
+                width: 32, height: 32, border: 'none',
+                background: 'var(--primary)', color: 'var(--on-primary)',
+                borderRadius: 4, fontFamily: 'Inter', fontWeight: 700, fontSize: 12, cursor: 'pointer',
+              }}>1</button>
+              <button style={{
+                padding: 4, border: '1px solid var(--outline-variant)',
+                background: 'var(--surface-container-lowest)', borderRadius: 4,
+                color: 'var(--on-surface-variant)', opacity: 0.5, cursor: 'default', display: 'flex',
+              }}>
+                <span className="material-symbols-outlined">chevron_right</span>
+              </button>
+            </div>
           </div>
         )}
       </div>

@@ -9,26 +9,18 @@ export default function Locations() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
-    name: '',
-    latitude: '',
-    longitude: '',
-    radius_meters: '100',
-    address: '',
-    active: true,
+    name: '', latitude: '', longitude: '',
+    radius_meters: '100', address: '', active: true,
   });
 
-  useEffect(() => {
-    loadLocations();
-  }, []);
+  useEffect(() => { loadLocations(); }, []);
 
   const loadLocations = async () => {
     try {
       setError(null);
       const data = await getLocations();
-      console.log('Locations loaded:', data);
       setLocations(data || []);
     } catch (error: any) {
-      console.error('Error loading locations:', error);
       setError(error.message || 'Erro ao carregar locais');
     } finally {
       setLoading(false);
@@ -44,13 +36,11 @@ export default function Locations() {
         longitude: parseFloat(formData.longitude),
         radius_meters: parseInt(formData.radius_meters),
       };
-
       if (editingId) {
         await updateLocation(editingId, data);
       } else {
         await createLocation(data);
       }
-
       resetForm();
       loadLocations();
     } catch (error: any) {
@@ -88,280 +78,270 @@ export default function Locations() {
     setShowForm(false);
   };
 
+  const avgRadius = locations.length > 0
+    ? Math.round(locations.reduce((acc, l) => acc + l.radius_meters, 0) / locations.length)
+    : 0;
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-center">
-          <div className="spinner mx-auto mb-4"></div>
-          <p className="text-on-surface-variant font-medium mt-4">Carregando locais...</p>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div className="spinner" style={{ margin: '0 auto 16px' }}></div>
+          <p className="font-body-sm text-body-sm text-on-surface-variant" style={{ marginTop: 16 }}>Carregando locais...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="animate-fade-in">
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-primary mb-2">Locais</h1>
-            <p className="text-on-surface-variant">Gerencie os locais de registro de presença</p>
-          </div>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="btn-primary flex items-center gap-2"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            {showForm ? 'Cancelar' : 'Novo Local'}
-          </button>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
+        <div>
+          <h1 className="font-headline-md text-headline-md text-primary" style={{ marginBottom: 4 }}>Configurações de Localização</h1>
+          <p className="font-body-sm text-body-sm text-on-surface-variant">Gerencie os perímetros físicos onde os colaboradores podem registrar o ponto.</p>
         </div>
+        <button
+          onClick={() => setShowForm(!showForm)}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            background: showForm ? 'var(--surface-container-lowest)' : 'var(--primary)',
+            color: showForm ? 'var(--primary)' : 'var(--on-primary)',
+            border: showForm ? '1px solid var(--outline)' : 'none',
+            padding: '10px 20px', borderRadius: 12,
+            fontFamily: 'Inter', fontWeight: 600, fontSize: 12, letterSpacing: '0.05em',
+            cursor: 'pointer', transition: 'all 0.2s',
+          }}>
+          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+            {showForm ? 'close' : 'add_location_alt'}
+          </span>
+          {showForm ? 'Cancelar' : 'Adicionar Novo Local'}
+        </button>
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="card flex items-center gap-4">
-          <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
+        {[
+          { label: 'TOTAL DE LOCAIS', value: locations.length, icon: 'location_on', color: 'var(--primary)', bg: 'var(--primary-fixed)' },
+          { label: 'LOCAIS ATIVOS', value: locations.filter(l => l.active).length, icon: 'verified_user', color: 'var(--secondary)', bg: 'rgba(0,108,73,0.1)' },
+          { label: 'RAIO MÉDIO', value: `${avgRadius}m`, icon: 'radar', color: 'var(--tertiary)', bg: 'var(--tertiary-fixed)' },
+        ].map((stat) => (
+          <div key={stat.label} style={{
+            background: 'var(--surface-container-lowest)',
+            borderRadius: 12, padding: 16,
+            border: '1px solid var(--outline-variant)',
+            display: 'flex', alignItems: 'center', gap: 16,
+            boxShadow: '0 2px 8px rgba(0,30,64,0.06)',
+          }}>
+            <div style={{ background: stat.bg, color: stat.color, padding: 10, borderRadius: '50%', display: 'flex' }}>
+              <span className="material-symbols-outlined">{stat.icon}</span>
+            </div>
+            <div>
+              <p className="font-label-caps text-label-caps text-on-surface-variant">{stat.label}</p>
+              <p className="font-headline-sm text-headline-sm" style={{ color: stat.color }}>{stat.value}</p>
+            </div>
           </div>
-          <div>
-            <p className="text-xs font-bold text-on-surface-variant uppercase">Total de Locais</p>
-            <p className="text-2xl font-bold text-primary">{locations.length}</p>
-          </div>
-        </div>
-
-        <div className="card flex items-center gap-4">
-          <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center text-secondary">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div>
-            <p className="text-xs font-bold text-on-surface-variant uppercase">Locais Ativos</p>
-            <p className="text-2xl font-bold text-secondary">{locations.filter(l => l.active).length}</p>
-          </div>
-        </div>
-
-        <div className="card flex items-center gap-4">
-          <div className="w-12 h-12 bg-tertiary/10 rounded-full flex items-center justify-center text-tertiary">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-            </svg>
-          </div>
-          <div>
-            <p className="text-xs font-bold text-on-surface-variant uppercase">Raio Médio</p>
-            <p className="text-2xl font-bold text-tertiary">
-              {locations.length > 0 
-                ? `${Math.round(locations.reduce((acc, l) => acc + l.radius_meters, 0) / locations.length)}m`
-                : '0m'
-              }
-            </p>
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* Error Message */}
+      {/* Error */}
       {error && (
-        <div className="mb-6 p-4 bg-error-container border border-error rounded-xl flex items-start gap-3">
-          <svg className="w-5 h-5 text-error flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+        <div style={{
+          marginBottom: 16, padding: 16,
+          background: 'var(--error-container)', border: '1px solid var(--error)',
+          borderRadius: 12, display: 'flex', alignItems: 'center', gap: 12,
+        }}>
+          <span className="material-symbols-outlined text-error">error</span>
           <div>
-            <p className="text-error font-semibold text-sm">Erro ao carregar</p>
-            <p className="text-error text-sm">{error}</p>
+            <p className="font-label-bold text-label-bold text-error">Erro ao carregar</p>
+            <p className="font-body-sm text-body-sm text-error">{error}</p>
           </div>
         </div>
       )}
 
       {/* Form */}
       {showForm && (
-        <div className="card mb-8 animate-fade-in">
-          <h2 className="text-2xl font-bold text-primary mb-6">
+        <div className="animate-fade-in" style={{
+          background: 'var(--surface-container-lowest)',
+          borderRadius: 12, padding: 24,
+          border: '1px solid var(--outline-variant)',
+          marginBottom: 24,
+          boxShadow: '0 2px 8px rgba(0,30,64,0.06)',
+        }}>
+          <h2 className="font-headline-sm text-headline-sm text-primary" style={{ marginBottom: 24 }}>
             {editingId ? 'Editar Local' : 'Cadastrar Novo Local'}
           </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16, marginBottom: 16 }}>
             <div>
-              <label className="block text-sm font-semibold text-on-surface-variant mb-2">Nome do Local</label>
-              <input
-                type="text"
-                value={formData.name}
+              <label className="font-label-bold text-label-bold text-on-surface-variant" style={{ display: 'block', marginBottom: 8 }}>Nome do Local</label>
+              <input type="text" value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full"
-                placeholder="Ex: Escritório Central"
-                required
-              />
+                placeholder="Ex: Escritório Central" />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-on-surface-variant mb-2">Raio de Alcance (metros)</label>
-              <input
-                type="number"
-                value={formData.radius_meters}
+              <label className="font-label-bold text-label-bold text-on-surface-variant" style={{ display: 'block', marginBottom: 8 }}>Raio de Alcance (metros)</label>
+              <input type="number" value={formData.radius_meters}
                 onChange={(e) => setFormData({ ...formData, radius_meters: e.target.value })}
-                className="w-full"
-                placeholder="100"
-              />
+                placeholder="100" />
             </div>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16, marginBottom: 16 }}>
             <div>
-              <label className="block text-sm font-semibold text-on-surface-variant mb-2">Latitude</label>
-              <input
-                type="number"
-                step="any"
-                value={formData.latitude}
+              <label className="font-label-bold text-label-bold text-on-surface-variant" style={{ display: 'block', marginBottom: 8 }}>Latitude</label>
+              <input type="number" step="any" value={formData.latitude}
                 onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
-                className="w-full"
-                placeholder="-23.561414"
-                required
-              />
+                placeholder="-23.561414" />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-on-surface-variant mb-2">Longitude</label>
-              <input
-                type="number"
-                step="any"
-                value={formData.longitude}
+              <label className="font-label-bold text-label-bold text-on-surface-variant" style={{ display: 'block', marginBottom: 8 }}>Longitude</label>
+              <input type="number" step="any" value={formData.longitude}
                 onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
-                className="w-full"
-                placeholder="-46.655881"
-                required
-              />
+                placeholder="-46.655881" />
             </div>
           </div>
-
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-on-surface-variant mb-2">Endereço Completo</label>
-            <input
-              type="text"
-              value={formData.address}
+          <div style={{ marginBottom: 16 }}>
+            <label className="font-label-bold text-label-bold text-on-surface-variant" style={{ display: 'block', marginBottom: 8 }}>Endereço Completo</label>
+            <input type="text" value={formData.address}
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              className="w-full"
-              placeholder="Rua, Número, Cidade - Estado"
-            />
+              placeholder="Rua, Número, Cidade - Estado" />
           </div>
-
-          <div className="mb-6">
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={formData.active}
+          <div style={{ marginBottom: 20 }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+              <input type="checkbox" checked={formData.active}
                 onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
-                className="w-5 h-5 text-secondary rounded focus:ring-secondary"
-              />
-              <span className="ml-3 text-sm font-medium text-on-surface">Local ativo e disponível para registros</span>
+                style={{ width: 18, height: 18, minHeight: 18, accentColor: 'var(--secondary)', cursor: 'pointer' }} />
+              <span className="font-body-sm text-body-sm text-on-surface">Local ativo e disponível para registros</span>
             </label>
           </div>
-
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="btn-primary"
-            >
+          <div style={{ display: 'flex', gap: 12 }}>
+            <button onClick={handleSubmit} style={{
+              background: 'var(--primary)', color: 'var(--on-primary)',
+              padding: '10px 20px', borderRadius: 8, fontFamily: 'Inter', fontWeight: 600, fontSize: 12,
+              letterSpacing: '0.05em', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
+            }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>save</span>
               {editingId ? 'Atualizar Local' : 'Cadastrar Local'}
             </button>
-            <button
-              type="button"
-              onClick={resetForm}
-              className="btn-secondary"
-            >
+            <button onClick={resetForm} style={{
+              background: 'var(--surface-container-lowest)', color: 'var(--on-surface)',
+              border: '1px solid var(--outline-variant)',
+              padding: '10px 20px', borderRadius: 8, fontFamily: 'Inter', fontWeight: 600, fontSize: 12,
+              letterSpacing: '0.05em', cursor: 'pointer',
+            }}>
               Cancelar
             </button>
           </div>
         </div>
       )}
 
-      {/* Table */}
-      <div className="card overflow-hidden p-0">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-surface-container">
-                <th className="text-left px-6 py-4">Nome</th>
-                <th className="text-left px-6 py-4">Coordenadas</th>
-                <th className="text-left px-6 py-4">Raio</th>
-                <th className="text-left px-6 py-4 hidden md:table-cell">Endereço</th>
-                <th className="text-left px-6 py-4">Status</th>
-                <th className="text-left px-6 py-4">Ações</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-outline-variant/30">
-              {locations.map((location) => (
-                <tr key={location.id} className="hover:bg-surface-container-lowest transition-colors">
-                  <td className="px-6 py-4">
-                    <span className="font-semibold text-primary">{location.name}</span>
-                  </td>
-                  <td className="px-6 py-4 text-on-surface-variant font-mono text-sm">
-                    {location.latitude}, {location.longitude}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="badge badge-blue">{location.radius_meters}m</span>
-                  </td>
-                  <td className="px-6 py-4 text-on-surface-variant text-sm hidden md:table-cell">
-                    {location.address || 'Não informado'}
-                  </td>
-                  <td className="px-6 py-4">
-                    {location.active ? (
-                      <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-bold bg-secondary/10 text-secondary">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        Ativo
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-bold bg-error/10 text-error">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                        </svg>
-                        Inativo
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleEdit(location)}
-                        className="text-primary hover:text-primary-container p-2 hover:bg-primary-fixed rounded-lg transition-colors"
-                        title="Editar"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                      </button>
-                      <button
-                        onClick={() => handleDelete(location.id)}
-                        className="text-error hover:text-error-container p-2 hover:bg-error-container/20 rounded-lg transition-colors"
-                        title="Excluir"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {locations.length === 0 && !error && (
-          <div className="text-center py-12">
-            <svg className="w-16 h-16 text-outline-variant mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <p className="text-on-surface-variant font-medium">Nenhum local cadastrado</p>
-            <p className="text-on-surface-variant text-sm mt-1">Clique em "Novo Local" para cadastrar</p>
+      {/* Location Cards + Table Toggle */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16, marginBottom: 24 }}>
+        {locations.map((location) => (
+          <div key={location.id} style={{
+            background: 'var(--surface-container-lowest)',
+            borderRadius: 12,
+            border: '1px solid rgba(195,198,209,0.3)',
+            borderLeft: `4px solid ${location.active ? 'var(--secondary)' : 'var(--outline-variant)'}`,
+            padding: 20,
+            boxShadow: '0 2px 8px rgba(0,30,64,0.06)',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            flexWrap: 'wrap', gap: 12,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, flex: 1 }}>
+              <div style={{
+                background: location.active ? 'rgba(0,108,73,0.1)' : 'var(--surface-container)',
+                color: location.active ? 'var(--secondary)' : 'var(--on-surface-variant)',
+                padding: 10, borderRadius: '50%', display: 'flex', flexShrink: 0,
+              }}>
+                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
+                  {location.active ? 'verified_user' : 'location_off'}
+                </span>
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                  <h3 className="font-headline-sm text-headline-sm text-on-surface">{location.name}</h3>
+                  <span style={{
+                    background: location.active ? 'var(--secondary-container)' : 'var(--surface-container-highest)',
+                    color: location.active ? 'var(--on-secondary-container)' : 'var(--on-surface-variant)',
+                    padding: '2px 8px', borderRadius: 9999, fontSize: 10, fontWeight: 700, letterSpacing: '0.05em',
+                  }}>
+                    {location.active ? 'ATIVO' : 'INATIVO'}
+                  </span>
+                </div>
+                <p className="font-body-sm text-body-sm text-on-surface-variant" style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 8 }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 16 }}>place</span>
+                  {location.address || `${location.latitude}, ${location.longitude}`}
+                </p>
+                <div style={{ display: 'flex', gap: 24 }}>
+                  <div>
+                    <span className="font-label-caps text-label-caps text-on-surface-variant" style={{ display: 'block', marginBottom: 2 }}>RAIO</span>
+                    <span className="font-label-bold text-label-bold text-on-surface">{location.radius_meters} Metros</span>
+                  </div>
+                  <div>
+                    <span className="font-label-caps text-label-caps text-on-surface-variant" style={{ display: 'block', marginBottom: 2 }}>COORDENADAS</span>
+                    <span className="font-label-bold text-label-bold text-on-surface" style={{ fontFamily: 'monospace', fontSize: 11 }}>
+                      {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+              <button onClick={() => handleEdit(location)} style={{
+                padding: 8, borderRadius: 6, background: 'transparent',
+                color: 'var(--primary)', cursor: 'pointer', display: 'flex',
+                transition: 'background 0.15s',
+              }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-container)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                <span className="material-symbols-outlined">edit</span>
+              </button>
+              <button onClick={() => handleDelete(location.id)} style={{
+                padding: 8, borderRadius: 6, background: 'transparent',
+                color: 'var(--on-surface-variant)', cursor: 'pointer', display: 'flex',
+                transition: 'all 0.15s',
+              }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'var(--error-container)'; e.currentTarget.style.color = 'var(--error)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--on-surface-variant)'; }}>
+                <span className="material-symbols-outlined">delete</span>
+              </button>
+            </div>
           </div>
-        )}
+        ))}
+      </div>
+
+      {locations.length === 0 && !error && (
+        <div style={{
+          background: 'var(--surface-container-lowest)',
+          borderRadius: 12, padding: 48,
+          border: '1px solid var(--outline-variant)',
+          textAlign: 'center',
+        }}>
+          <span className="material-symbols-outlined text-on-surface-variant" style={{ fontSize: 48, display: 'block', marginBottom: 12 }}>add_location_alt</span>
+          <p className="font-body-md text-body-md text-on-surface-variant" style={{ fontWeight: 600 }}>Nenhum local cadastrado</p>
+          <p className="font-body-sm text-body-sm text-on-surface-variant" style={{ marginTop: 4 }}>Clique em "Adicionar Novo Local" para começar</p>
+        </div>
+      )}
+
+      {/* Settings Info Row */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginTop: 24 }}>
+        {[
+          { icon: 'security_update_good', color: 'var(--primary)', title: 'Nível de Precisão', desc: 'Rastreamento GPS de alta precisão obrigatório. Sinal mínimo de -80dBm para check-in válido.' },
+          { icon: 'gpp_good', color: 'var(--secondary)', title: 'Alcance Global', desc: 'Soft-fencing permitido para equipes externas com logs de exceção aprovados pelo gestor.' },
+          { icon: 'report', color: 'var(--error)', title: 'Limites de Alerta', desc: 'Alertas em tempo real disparados após 3 falhas em tentativas fora das zonas do perímetro.' },
+        ].map((info) => (
+          <div key={info.title} style={{
+            background: 'var(--surface-container-low)',
+            borderRadius: 12, padding: 20,
+            border: '1px solid rgba(195,198,209,0.2)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+              <span className="material-symbols-outlined" style={{ color: info.color }}>{info.icon}</span>
+              <h4 className="font-headline-sm text-headline-sm" style={{ color: info.color }}>{info.title}</h4>
+            </div>
+            <p className="font-body-sm text-body-sm text-on-surface-variant">{info.desc}</p>
+          </div>
+        ))}
       </div>
     </div>
   );

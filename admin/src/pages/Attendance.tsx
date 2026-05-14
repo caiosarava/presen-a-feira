@@ -7,21 +7,18 @@ export default function Attendance() {
   const [filterPeriod, setFilterPeriod] = useState('today');
   const [filterStatus, setFilterStatus] = useState('all');
 
-  useEffect(() => {
-    loadRecords();
-  }, [filterPeriod, filterStatus]);
+  useEffect(() => { loadRecords(); }, [filterPeriod, filterStatus]);
 
   const loadRecords = async () => {
     try {
       setLoading(true);
-      const { data: recordsData, error } = await supabase
+      const { data, error } = await supabase
         .from('attendance_records')
         .select('*, profiles(full_name, email), locations(name)')
         .order('check_in', { ascending: false })
         .limit(50);
-
       if (error) throw error;
-      setRecords(recordsData || []);
+      setRecords(data || []);
     } catch (error: any) {
       console.error('Error loading attendance:', error);
     } finally {
@@ -29,222 +26,222 @@ export default function Attendance() {
     }
   };
 
-  const getStatusBadge = (checkIn: string) => {
-    const checkInDate = new Date(checkIn);
-    const hour = checkInDate.getHours();
-    const minutes = checkInDate.getMinutes();
-    const checkInTime = hour * 60 + minutes;
-    
-    // 9:00 AM = 540 minutes
-    if (checkInTime > 540) {
-      return { label: 'Atrasado', class: 'bg-error-container text-error', icon: 'warning' };
-    }
-    return { label: 'No Horário', class: 'bg-secondary/10 text-secondary', icon: 'check_circle' };
+  const isOnTime = (checkIn: string) => {
+    const d = new Date(checkIn);
+    return d.getHours() * 60 + d.getMinutes() <= 540;
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
-  };
+  const formatDate = (s: string) => new Date(s).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+  const formatTime = (s: string) => new Date(s).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-  };
+  const getInitials = (name: string, email: string) =>
+    name ? name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
+         : email?.charAt(0).toUpperCase() || 'U';
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-center">
-          <div className="spinner mx-auto mb-4"></div>
-          <p className="text-on-surface-variant font-medium mt-4">Carregando histórico...</p>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div className="spinner" style={{ margin: '0 auto 16px' }}></div>
+          <p className="font-body-sm text-body-sm text-on-surface-variant" style={{ marginTop: 16 }}>Carregando histórico...</p>
         </div>
       </div>
     );
   }
 
-  const stats = {
-    total: records.length,
-    onTime: records.filter(r => {
-      const checkInDate = new Date(r.check_in);
-      const hour = checkInDate.getHours();
-      const minutes = checkInDate.getMinutes();
-      return hour * 60 + minutes <= 540;
-    }).length,
-    late: records.filter(r => {
-      const checkInDate = new Date(r.check_in);
-      const hour = checkInDate.getHours();
-      const minutes = checkInDate.getMinutes();
-      return hour * 60 + minutes > 540;
-    }).length,
-    avgDuration: '8.2h'
-  };
+  const onTimeCount = records.filter(r => isOnTime(r.check_in)).length;
+  const lateCount = records.filter(r => !isOnTime(r.check_in)).length;
 
   return (
-    <div>
+    <div className="animate-fade-in">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-primary mb-2">Histórico de Registros</h1>
-        <p className="text-on-surface-variant">Acompanhe todos os registros de ponto dos colaboradores</p>
+      <div style={{ marginBottom: 32 }}>
+        <h1 className="font-headline-md text-headline-md text-primary" style={{ marginBottom: 4 }}>Histórico Global de Presença</h1>
+        <p className="font-body-sm text-body-sm text-on-surface-variant">Acompanhe todos os registros de ponto dos colaboradores</p>
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="card flex items-center gap-4">
-          <div className="w-12 h-12 bg-surface-container rounded-full flex items-center justify-center text-primary">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-2.02M21 21v-2a3 3 0 00-3-3h-1m-15 0a3 3 0 00-5.356 2.02M3 21v-2a3 3 0 003-3h1" />
-            </svg>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
+        {[
+          { label: 'TOTAL DE REGISTROS', value: records.length, icon: 'group', color: 'var(--primary)', bg: 'var(--surface-container)' },
+          { label: 'NO HORÁRIO', value: onTimeCount, icon: 'verified', color: 'var(--secondary)', bg: 'rgba(0,108,73,0.1)' },
+          { label: 'ATRASOS', value: lateCount, icon: 'schedule', color: 'var(--error)', bg: 'var(--error-container)' },
+          { label: 'DURAÇÃO MÉDIA', value: '8.2h', icon: 'avg_pace', color: 'var(--primary)', bg: 'var(--primary-fixed)' },
+        ].map((stat) => (
+          <div key={stat.label} style={{
+            background: 'var(--surface-container-lowest)',
+            borderRadius: 12, padding: 16,
+            border: '1px solid var(--outline-variant)',
+            display: 'flex', alignItems: 'center', gap: 14,
+            boxShadow: '0 2px 8px rgba(0,30,64,0.06)',
+          }}>
+            <div style={{ background: stat.bg, color: stat.color, padding: 10, borderRadius: '50%', display: 'flex', flexShrink: 0 }}>
+              <span className="material-symbols-outlined">{stat.icon}</span>
+            </div>
+            <div>
+              <p className="font-label-caps text-label-caps text-on-surface-variant">{stat.label}</p>
+              <p className="font-headline-sm text-headline-sm" style={{ color: stat.color }}>{stat.value}</p>
+            </div>
           </div>
-          <div>
-            <p className="text-xs font-bold text-on-surface-variant uppercase">Total de Registros</p>
-            <p className="text-2xl font-bold text-primary">{stats.total}</p>
-          </div>
-        </div>
-
-        <div className="card flex items-center gap-4">
-          <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center text-secondary">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div>
-            <p className="text-xs font-bold text-on-surface-variant uppercase">No Horário</p>
-            <p className="text-2xl font-bold text-secondary">{stats.onTime}</p>
-          </div>
-        </div>
-
-        <div className="card flex items-center gap-4">
-          <div className="w-12 h-12 bg-error/10 rounded-full flex items-center justify-center text-error">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div>
-            <p className="text-xs font-bold text-on-surface-variant uppercase">Atrasos</p>
-            <p className="text-2xl font-bold text-error">{stats.late}</p>
-          </div>
-        </div>
-
-        <div className="card flex items-center gap-4">
-          <div className="w-12 h-12 bg-tertiary-container/10 rounded-full flex items-center justify-center text-tertiary">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div>
-            <p className="text-xs font-bold text-on-surface-variant uppercase">Duração Média</p>
-            <p className="text-2xl font-bold text-primary">{stats.avgDuration}</p>
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* Filters and Actions */}
-      <div className="card mb-8">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div className="flex flex-wrap gap-4">
-            <div>
-              <label className="block text-xs font-bold text-on-surface-variant mb-2">Período</label>
-              <select
-                value={filterPeriod}
-                onChange={(e) => setFilterPeriod(e.target.value)}
-                className="min-w-[150px]"
-              >
-                <option value="today">Hoje</option>
-                <option value="yesterday">Ontem</option>
-                <option value="week">Últimos 7 dias</option>
-                <option value="month">Este mês</option>
+      {/* Filters + Export */}
+      <div style={{
+        background: 'var(--surface-container-lowest)',
+        borderRadius: 12, padding: 16,
+        border: '1px solid var(--outline-variant)',
+        marginBottom: 24,
+        display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
+        flexWrap: 'wrap', gap: 16,
+        boxShadow: '0 2px 8px rgba(0,30,64,0.06)',
+      }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, flex: 1 }}>
+          {[
+            {
+              label: 'Período', type: 'select',
+              value: filterPeriod, onChange: setFilterPeriod,
+              options: [['today','Hoje'],['yesterday','Ontem'],['week','Últimos 7 dias'],['month','Este mês']] as [string,string][],
+            },
+            {
+              label: 'Status', type: 'select',
+              value: filterStatus, onChange: setFilterStatus,
+              options: [['all','Todos'],['ontime','No Horário'],['late','Atrasado']] as [string,string][],
+            },
+          ].map(({ label, value, onChange, options }) => (
+            <div key={label}>
+              <label className="font-label-bold text-label-bold text-on-surface-variant" style={{ display: 'block', marginBottom: 6 }}>{label}</label>
+              <select className="select-arrow" value={value}
+                onChange={(e) => onChange(e.target.value)}>
+                {options.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
               </select>
             </div>
-            <div>
-              <label className="block text-xs font-bold text-on-surface-variant mb-2">Status</label>
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="min-w-[150px]"
-              >
-                <option value="all">Todos</option>
-                <option value="ontime">No Horário</option>
-                <option value="late">Atrasado</option>
-              </select>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <button className="flex items-center gap-2 bg-surface-container-lowest border border-primary text-primary px-4 py-2 rounded-lg hover:bg-primary-container hover:text-on-primary-container transition-all">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6M21 10a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Exportar CSV
-            </button>
-            <button className="flex items-center gap-2 bg-primary text-on-primary px-4 py-2 rounded-lg shadow-md hover:opacity-90 transition-all">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              Exportar PDF
-            </button>
-          </div>
+          ))}
+        </div>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            background: 'var(--surface-container-lowest)', color: 'var(--primary)',
+            border: '1px solid var(--primary)',
+            padding: '10px 16px', borderRadius: 8,
+            fontFamily: 'Inter', fontWeight: 600, fontSize: 12, letterSpacing: '0.05em', cursor: 'pointer',
+          }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>description</span>
+            Exportar CSV
+          </button>
+          <button style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            background: 'var(--primary)', color: 'var(--on-primary)',
+            padding: '10px 16px', borderRadius: 8,
+            fontFamily: 'Inter', fontWeight: 600, fontSize: 12, letterSpacing: '0.05em', cursor: 'pointer',
+          }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>picture_as_pdf</span>
+            Exportar PDF
+          </button>
         </div>
       </div>
 
       {/* Table */}
-      <div className="card overflow-hidden p-0">
-        <div className="overflow-x-auto">
-          <table className="w-full">
+      <div style={{
+        background: 'var(--surface-container-lowest)',
+        borderRadius: 12,
+        border: '1px solid var(--outline-variant)',
+        boxShadow: '0 2px 8px rgba(0,30,64,0.06)',
+        overflow: 'hidden',
+      }}>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr className="bg-surface-container">
-                <th className="text-left px-6 py-4">Colaborador</th>
-                <th className="text-left px-6 py-4">Data</th>
-                <th className="text-left px-6 py-4">Entrada</th>
-                <th className="text-left px-6 py-4">Saída</th>
-                <th className="text-left px-6 py-4">Local</th>
-                <th className="text-left px-6 py-4">Status</th>
+              <tr style={{ background: 'var(--surface-container-low)', borderBottom: '1px solid var(--outline-variant)' }}>
+                {['COLABORADOR', 'DATA', 'ENTRADA', 'SAÍDA', 'LOCALIZAÇÃO', 'STATUS', 'AÇÃO'].map(h => (
+                  <th key={h} style={{
+                    padding: '12px 24px', textAlign: 'left',
+                    fontSize: 11, fontWeight: 700, letterSpacing: '0.1em',
+                    color: 'var(--on-surface-variant)', fontFamily: 'Inter',
+                  }}>{h}</th>
+                ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-outline-variant/30">
+            <tbody>
               {records.map((record) => {
-                const status = getStatusBadge(record.check_in);
+                const onTime = isOnTime(record.check_in);
                 return (
-                  <tr key={record.id} className="hover:bg-surface-container-lowest transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold">
-                          {record.profiles?.full_name?.charAt(0) || 'U'}
+                  <tr key={record.id}
+                    style={{ borderBottom: '1px solid rgba(195,198,209,0.3)', transition: 'background 0.15s', cursor: 'default' }}
+                    onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-container-low)')}
+                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                    <td style={{ padding: '14px 24px', borderLeft: `4px solid ${onTime ? 'var(--secondary)' : 'var(--error)'}` }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <div style={{
+                          width: 32, height: 32, borderRadius: '50%',
+                          background: 'var(--primary-fixed)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          color: 'var(--primary)', fontWeight: 700, fontSize: 12,
+                        }}>
+                          {getInitials(record.profiles?.full_name, record.profiles?.email)}
                         </div>
                         <div>
-                          <p className="font-semibold text-on-surface">{record.profiles?.full_name || 'Usuário'}</p>
-                          <p className="text-xs text-on-surface-variant">{record.profiles?.email || ''}</p>
+                          <p className="font-label-bold text-label-bold text-on-surface">{record.profiles?.full_name || 'Usuário'}</p>
+                          <p style={{ fontSize: 10, color: 'var(--on-surface-variant)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                            {record.profiles?.email || ''}
+                          </p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-on-surface-variant">
-                      {formatDate(record.check_in)}
+                    <td style={{ padding: '14px 24px' }}>
+                      <span className="font-body-sm text-body-sm text-on-surface-variant">{formatDate(record.check_in)}</span>
                     </td>
-                    <td className="px-6 py-4 font-bold text-primary">
-                      {formatTime(record.check_in)}
+                    <td style={{ padding: '14px 24px' }}>
+                      <span className="font-body-sm text-body-sm text-primary" style={{ fontWeight: 700 }}>{formatTime(record.check_in)}</span>
                     </td>
-                    <td className="px-6 py-4 font-bold text-primary">
-                      {record.check_out ? formatTime(record.check_out) : '--:--'}
+                    <td style={{ padding: '14px 24px' }}>
+                      <span className="font-body-sm text-body-sm text-primary" style={{ fontWeight: 700 }}>
+                        {record.check_out ? formatTime(record.check_out) : '--:--'}
+                      </span>
                     </td>
-                    <td className="px-6 py-4 text-on-surface-variant">
-                      <div className="flex items-center gap-2">
-                        <svg className="w-4 h-4 text-outline-variant" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <span>{record.locations?.name || 'Não informado'}</span>
+                    <td style={{ padding: '14px 24px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span className="material-symbols-outlined text-on-surface-variant" style={{ fontSize: 16 }}>
+                          {record.locations ? 'location_on' : 'location_off'}
+                        </span>
+                        <span className="font-body-sm text-body-sm text-on-surface-variant">
+                          {record.locations?.name || 'Não informado'}
+                        </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-bold ${status.class}`}>
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                          {status.icon === 'check_circle' ? (
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          ) : (
-                            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 3.003-1.742 3.003H5.72c-1.529 0-2.493-1.667-1.743-3.003l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                          )}
-                        </svg>
-                        {status.label}
-                      </span>
+                    <td style={{ padding: '14px 24px' }}>
+                      {onTime ? (
+                        <span style={{
+                          display: 'inline-flex', alignItems: 'center', gap: 4,
+                          background: 'rgba(0,108,73,0.1)', color: 'var(--secondary)',
+                          border: '1px solid rgba(0,108,73,0.2)',
+                          padding: '3px 10px', borderRadius: 9999, fontSize: 11, fontWeight: 700,
+                        }}>
+                          <span className="material-symbols-outlined" style={{ fontSize: 13, fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                          No Raio
+                        </span>
+                      ) : (
+                        <span style={{
+                          display: 'inline-flex', alignItems: 'center', gap: 4,
+                          background: 'var(--error-container)', color: 'var(--error)',
+                          border: '1px solid rgba(186,26,26,0.2)',
+                          padding: '3px 10px', borderRadius: 9999, fontSize: 11, fontWeight: 700,
+                        }}>
+                          <span className="material-symbols-outlined" style={{ fontSize: 13, fontVariationSettings: "'FILL' 1" }}>warning</span>
+                          Atrasado
+                        </span>
+                      )}
+                    </td>
+                    <td style={{ padding: '14px 24px' }}>
+                      <button style={{
+                        padding: 4, background: 'transparent', cursor: 'pointer',
+                        color: 'var(--on-surface-variant)', display: 'flex', borderRadius: 4,
+                        transition: 'color 0.15s',
+                      }}
+                        onMouseEnter={e => (e.currentTarget.style.color = 'var(--primary)')}
+                        onMouseLeave={e => (e.currentTarget.style.color = 'var(--on-surface-variant)')}>
+                        <span className="material-symbols-outlined">more_vert</span>
+                      </button>
                     </td>
                   </tr>
                 );
@@ -254,12 +251,45 @@ export default function Attendance() {
         </div>
 
         {records.length === 0 && (
-          <div className="text-center py-12">
-            <svg className="w-16 h-16 text-outline-variant mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-            </svg>
-            <p className="text-on-surface-variant font-medium">Nenhum registro encontrado</p>
-            <p className="text-on-surface-variant text-sm mt-1">Os registros de ponto aparecerão aqui</p>
+          <div style={{ textAlign: 'center', padding: '48px 0' }}>
+            <span className="material-symbols-outlined text-on-surface-variant" style={{ fontSize: 48, display: 'block', marginBottom: 12 }}>history</span>
+            <p className="font-body-md text-body-md text-on-surface-variant" style={{ fontWeight: 600 }}>Nenhum registro encontrado</p>
+            <p className="font-body-sm text-body-sm text-on-surface-variant" style={{ marginTop: 4 }}>Os registros de ponto aparecerão aqui</p>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {records.length > 0 && (
+          <div style={{
+            background: 'var(--surface-container-low)',
+            padding: '12px 24px',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            borderTop: '1px solid var(--outline-variant)',
+          }}>
+            <span className="font-body-sm text-body-sm text-on-surface-variant">
+              Exibindo 1 a {records.length} de {records.length} registros
+            </span>
+            <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+              <button style={{
+                padding: 4, border: '1px solid var(--outline-variant)',
+                background: 'var(--surface-container-lowest)', borderRadius: 4,
+                color: 'var(--on-surface-variant)', opacity: 0.5, cursor: 'default', display: 'flex',
+              }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 18 }}>chevron_left</span>
+              </button>
+              <button style={{
+                width: 32, height: 32, border: 'none',
+                background: 'var(--primary)', color: 'var(--on-primary)',
+                borderRadius: 4, fontFamily: 'Inter', fontWeight: 700, fontSize: 12, cursor: 'pointer',
+              }}>1</button>
+              <button style={{
+                padding: 4, border: '1px solid var(--outline-variant)',
+                background: 'var(--surface-container-lowest)', borderRadius: 4,
+                color: 'var(--on-surface-variant)', opacity: 0.5, cursor: 'default', display: 'flex',
+              }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 18 }}>chevron_right</span>
+              </button>
+            </div>
           </div>
         )}
       </div>

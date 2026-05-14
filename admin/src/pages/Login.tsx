@@ -15,7 +15,6 @@ export default function Login({ onLogin }: LoginProps) {
     e.preventDefault();
     setError('');
     setLoading(true);
-
     try {
       await signIn(email, password);
       onLogin();
@@ -27,74 +26,91 @@ export default function Login({ onLogin }: LoginProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-surface via-surface-container to-background flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Logo/Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-secondary to-green-700 rounded-2xl shadow-2xl mb-6">
-            <svg className="w-10 h-10 text-on-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    <div style={{
+      minHeight: '100vh',
+      background: 'var(--background)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: 16,
+    }}>
+      <div style={{ width: '100%', maxWidth: 440 }}>
+        {/* Logo */}
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            width: 56, height: 56,
+            background: 'var(--primary)',
+            borderRadius: 14, marginBottom: 20,
+            boxShadow: '0 8px 24px rgba(0,30,64,0.2)',
+          }}>
+            <svg width="28" height="28" fill="white" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v5l4.25 2.54.75-1.23-3.5-2.08V7z"/>
             </svg>
           </div>
-          <h1 className="text-4xl font-bold text-primary mb-2">Precision Attendance</h1>
-          <p className="text-on-surface-variant font-medium">Painel Administrativo</p>
+          <h1 className="font-headline-md text-headline-md text-primary" style={{ marginBottom: 4 }}>Precision Attendance</h1>
+          <p className="font-body-sm text-body-sm text-on-surface-variant">Painel Administrativo</p>
         </div>
 
         {/* Card */}
-        <div className="card">
+        <div style={{
+          background: 'var(--surface-container-lowest)',
+          borderRadius: 16,
+          padding: 32,
+          border: '1px solid var(--outline-variant)',
+          boxShadow: '0 4px 24px rgba(0,30,64,0.08)',
+        }}>
+          <h2 className="font-headline-sm text-headline-sm text-primary" style={{ marginBottom: 24 }}>Entrar na sua conta</h2>
+
           <form onSubmit={handleSubmit}>
-            <div className="mb-6">
-              <label className="block text-sm font-semibold text-on-surface-variant mb-2">
+            <div style={{ marginBottom: 16 }}>
+              <label className="font-label-bold text-label-bold text-on-surface-variant" style={{ display: 'block', marginBottom: 8 }}>
                 Email
               </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                </span>
+              <div style={{ position: 'relative' }}>
+                <span className="material-symbols-outlined text-on-surface-variant" style={{
+                  position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
+                  fontSize: 20, pointerEvents: 'none',
+                }}>mail</span>
                 <input
-                  type="email"
-                  value={email}
+                  type="email" value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3"
-                  placeholder="admin@exemplo.com"
-                  required
-                  disabled={loading}
+                  placeholder="admin@empresa.com"
+                  required disabled={loading}
+                  style={{ paddingLeft: 40 }}
                 />
               </div>
             </div>
 
-            <div className="mb-6">
-              <label className="block text-sm font-semibold text-on-surface-variant mb-2">
+            <div style={{ marginBottom: 24 }}>
+              <label className="font-label-bold text-label-bold text-on-surface-variant" style={{ display: 'block', marginBottom: 8 }}>
                 Senha
               </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a2 2 0 00-2-2h-2a2 2 0 00-2 2v4h-4v4h4v4a2 2 0 002 2h2a2 2 0 002-2v-4h4v-4h-4z" />
-                  </svg>
-                </span>
+              <div style={{ position: 'relative' }}>
+                <span className="material-symbols-outlined text-on-surface-variant" style={{
+                  position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
+                  fontSize: 20, pointerEvents: 'none',
+                }}>lock</span>
                 <input
-                  type="password"
-                  value={password}
+                  type="password" value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3"
                   placeholder="••••••••"
-                  required
-                  disabled={loading}
+                  required disabled={loading}
+                  style={{ paddingLeft: 40 }}
                 />
               </div>
             </div>
 
             {error && (
-              <div className="mb-6 p-4 bg-error-container border border-error rounded-xl flex items-start gap-3">
-                <svg className="w-5 h-5 text-error flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+              <div style={{
+                marginBottom: 16, padding: 14,
+                background: 'var(--error-container)',
+                border: '1px solid rgba(186,26,26,0.3)',
+                borderRadius: 10,
+                display: 'flex', alignItems: 'flex-start', gap: 10,
+              }}>
+                <span className="material-symbols-outlined text-error" style={{ fontSize: 18, flexShrink: 0, marginTop: 1 }}>error</span>
                 <div>
-                  <p className="text-error font-semibold text-sm">Erro no login</p>
-                  <p className="text-error text-sm">{error}</p>
+                  <p className="font-label-bold text-label-bold text-error">Erro no login</p>
+                  <p className="font-body-sm text-body-sm text-error" style={{ marginTop: 2 }}>{error}</p>
                 </div>
               </div>
             )}
@@ -102,44 +118,56 @@ export default function Login({ onLogin }: LoginProps) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full btn-primary py-4 text-lg"
-            >
+              style={{
+                width: '100%',
+                background: loading ? 'var(--secondary-fixed-dim)' : 'var(--secondary)',
+                color: 'var(--on-secondary)',
+                padding: '14px 24px',
+                borderRadius: 10,
+                fontFamily: 'Inter', fontWeight: 700, fontSize: 14,
+                cursor: loading ? 'not-allowed' : 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                transition: 'all 0.2s',
+                border: 'none',
+              }}>
               {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <>
+                  <div style={{
+                    width: 18, height: 18,
+                    border: '2px solid rgba(255,255,255,0.4)',
+                    borderTopColor: 'white',
+                    borderRadius: '50%',
+                    animation: 'spin 0.8s linear infinite',
+                  }} />
                   Entrando...
-                </span>
+                </>
               ) : (
-                <span className="flex items-center justify-center gap-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                  </svg>
+                <>
+                  <span className="material-symbols-outlined" style={{ fontSize: 20 }}>login</span>
                   Entrar
-                </span>
+                </>
               )}
             </button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-outline-variant">
-            <div className="bg-gradient-to-r from-green-50 to-green-100 -mx-4 -mb-4 p-4 rounded-xl">
-              <p className="text-xs text-on-surface-variant text-center font-medium">
-                <span className="text-secondary font-semibold">Credenciais de teste:</span>
-                <br />
-                admin@exemplo.com / sua-senha
+          <div style={{
+            marginTop: 24, paddingTop: 20,
+            borderTop: '1px solid var(--outline-variant)',
+          }}>
+            <div style={{
+              background: 'var(--surface-container-low)',
+              borderRadius: 8, padding: 12, textAlign: 'center',
+            }}>
+              <p className="font-label-bold text-label-bold text-on-surface-variant">
+                Sistema de Gestão de Presença com Geofencing
               </p>
             </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="text-center mt-8">
-          <p className="text-sm text-on-surface-variant">
-            Sistema de Gestão de Presença
-          </p>
-          <p className="text-xs text-outline-variant mt-1">
-            © 2024 Precision Attendance. Todos os direitos reservados.
-          </p>
-        </div>
+        <p className="font-body-sm text-body-sm text-on-surface-variant" style={{ textAlign: 'center', marginTop: 24 }}>
+          © 2024 Precision Attendance. Todos os direitos reservados.
+        </p>
       </div>
     </div>
   );
