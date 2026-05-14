@@ -89,7 +89,7 @@ export default function Locations() {
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
           <div className="spinner mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Carregando locais...</p>
+          <p className="text-on-surface-variant font-medium mt-4">Carregando locais...</p>
         </div>
       </div>
     );
@@ -101,12 +101,12 @@ export default function Locations() {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Locais</h1>
-            <p className="text-gray-600">Gerencie os locais de registro de presença</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-primary mb-2">Locais</h1>
+            <p className="text-on-surface-variant">Gerencie os locais de registro de presença</p>
           </div>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="btn-primary flex items-center gap-2"
+            className="btn-primary hidden md:flex items-center gap-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -114,18 +114,24 @@ export default function Locations() {
             {showForm ? 'Cancelar' : 'Novo Local'}
           </button>
         </div>
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className="btn-primary md:hidden mt-4 w-full"
+        >
+          {showForm ? 'Cancelar' : 'Novo Local'}
+        </button>
       </div>
 
       {/* Form */}
       {showForm && (
         <div className="card mb-8 animate-fade-in">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          <h2 className="text-2xl font-bold text-primary mb-6">
             {editingId ? 'Editar Local' : 'Cadastrar Novo Local'}
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Nome do Local</label>
+              <label className="block text-sm font-semibold text-on-surface-variant mb-2">Nome do Local</label>
               <input
                 type="text"
                 value={formData.name}
@@ -136,7 +142,7 @@ export default function Locations() {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Raio de Alcance (metros)</label>
+              <label className="block text-sm font-semibold text-on-surface-variant mb-2">Raio de Alcance (metros)</label>
               <input
                 type="number"
                 value={formData.radius_meters}
@@ -149,7 +155,7 @@ export default function Locations() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Latitude</label>
+              <label className="block text-sm font-semibold text-on-surface-variant mb-2">Latitude</label>
               <input
                 type="number"
                 step="any"
@@ -161,7 +167,7 @@ export default function Locations() {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Longitude</label>
+              <label className="block text-sm font-semibold text-on-surface-variant mb-2">Longitude</label>
               <input
                 type="number"
                 step="any"
@@ -175,7 +181,7 @@ export default function Locations() {
           </div>
 
           <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Endereço Completo</label>
+            <label className="block text-sm font-semibold text-on-surface-variant mb-2">Endereço Completo</label>
             <input
               type="text"
               value={formData.address}
@@ -191,9 +197,9 @@ export default function Locations() {
                 type="checkbox"
                 checked={formData.active}
                 onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
-                className="w-5 h-5 text-green-600 rounded focus:ring-green-500"
+                className="w-5 h-5 text-secondary rounded focus:ring-secondary"
               />
-              <span className="ml-3 text-sm font-medium text-gray-700">Local ativo e disponível para registros</span>
+              <span className="ml-3 text-sm font-medium text-on-surface">Local ativo e disponível para registros</span>
             </label>
           </div>
 
@@ -225,7 +231,7 @@ export default function Locations() {
                 <th className="text-left">Nome</th>
                 <th className="text-left">Coordenadas</th>
                 <th className="text-left">Raio</th>
-                <th className="text-left">Endereço</th>
+                <th className="text-left hidden md:table-cell">Endereço</th>
                 <th className="text-left">Status</th>
                 <th className="text-left">Ações</th>
               </tr>
@@ -233,19 +239,24 @@ export default function Locations() {
             <tbody>
               {locations.map((location) => (
                 <tr key={location.id}>
-                  <td className="font-semibold text-gray-900">{location.name}</td>
-                  <td className="text-gray-600 font-mono text-sm">
+                  <td className="font-semibold text-primary">{location.name}</td>
+                  <td className="text-on-surface-variant font-mono text-sm">
                     {location.latitude}, {location.longitude}
                   </td>
                   <td>
                     <span className="badge badge-blue">{location.radius_meters}m</span>
                   </td>
-                  <td className="text-gray-600 text-sm max-w-xs truncate">
+                  <td className="text-on-surface-variant text-sm hidden md:table-cell">
                     {location.address || 'Não informado'}
                   </td>
                   <td>
                     {location.active ? (
-                      <span className="badge badge-green">Ativo</span>
+                      <span className="badge badge-green flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                        Ativo
+                      </span>
                     ) : (
                       <span className="badge badge-red">Inativo</span>
                     )}
@@ -254,7 +265,7 @@ export default function Locations() {
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleEdit(location)}
-                        className="text-blue-600 hover:text-blue-800 p-2 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="text-primary hover:text-primary-container p-2 hover:bg-primary-fixed rounded-lg transition-colors"
                         title="Editar"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -263,7 +274,7 @@ export default function Locations() {
                       </button>
                       <button
                         onClick={() => handleDelete(location.id)}
-                        className="text-red-600 hover:text-red-800 p-2 hover:bg-red-50 rounded-lg transition-colors"
+                        className="text-error hover:text-error-container p-2 hover:bg-error-container/20 rounded-lg transition-colors"
                         title="Excluir"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -279,12 +290,12 @@ export default function Locations() {
         </div>
         {locations.length === 0 && (
           <div className="text-center py-12">
-            <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-16 h-16 text-outline-variant mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            <p className="text-gray-500 font-medium">Nenhum local cadastrado</p>
-            <p className="text-gray-400 text-sm mt-1">Clique em "Novo Local" para cadastrar</p>
+            <p className="text-on-surface-variant font-medium">Nenhum local cadastrado</p>
+            <p className="text-on-surface-variant text-sm mt-1">Clique em "Novo Local" para cadastrar</p>
           </div>
         )}
       </div>
