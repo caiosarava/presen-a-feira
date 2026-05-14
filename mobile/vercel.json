@@ -1,17 +1,6 @@
 {
-  "buildCommand": "expo export --platform web",
+  "buildCommand": "npx expo export -p web",
   "outputDirectory": "dist",
-  "devCommand": "expo",
-  "installCommand": "npm install",
-  "framework": null,
-  "rewrites": [
-    {
-      "source": "/mobile/:path*",
-      "destination": "/mobile/:path*"
-    },
-    {
-      "source": "/mobile",
-      "destination": "/mobile/index.html"
-    }
-  ]
+  "devCommand": "npx expo",
+  "installCommand": "npm install --legacy-peer-deps"
 }
