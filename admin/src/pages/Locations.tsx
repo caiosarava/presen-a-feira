@@ -7,6 +7,7 @@ export default function Locations() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     latitude: '',
@@ -22,10 +23,13 @@ export default function Locations() {
 
   const loadLocations = async () => {
     try {
+      setError(null);
       const data = await getLocations();
+      console.log('Locations loaded:', data);
       setLocations(data || []);
-    } catch (error) {
-      console.error('Error:', error);
+    } catch (error: any) {
+      console.error('Error loading locations:', error);
+      setError(error.message || 'Erro ao carregar locais');
     } finally {
       setLoading(false);
     }
@@ -106,7 +110,7 @@ export default function Locations() {
           </div>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="btn-primary hidden md:flex items-center gap-2"
+            className="btn-primary flex items-center gap-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -114,13 +118,20 @@ export default function Locations() {
             {showForm ? 'Cancelar' : 'Novo Local'}
           </button>
         </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="btn-primary md:hidden mt-4 w-full"
-        >
-          {showForm ? 'Cancelar' : 'Novo Local'}
-        </button>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="mb-6 p-4 bg-error-container border border-error rounded-xl flex items-start gap-3">
+          <svg className="w-5 h-5 text-error flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <p className="text-error font-semibold text-sm">Erro ao carregar</p>
+            <p className="text-error text-sm">{error}</p>
+          </div>
+        </div>
+      )}
 
       {/* Form */}
       {showForm && (
@@ -288,7 +299,7 @@ export default function Locations() {
             </tbody>
           </table>
         </div>
-        {locations.length === 0 && (
+        {locations.length === 0 && !error && (
           <div className="text-center py-12">
             <svg className="w-16 h-16 text-outline-variant mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
