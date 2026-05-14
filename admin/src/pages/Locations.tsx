@@ -68,7 +68,7 @@ export default function Locations() {
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Tem certeza?')) {
+    if (confirm('Tem certeza que deseja excluir este local?')) {
       try {
         await deleteLocation(id);
         loadLocations();
@@ -84,150 +84,209 @@ export default function Locations() {
     setShowForm(false);
   };
 
-  if (loading) return <div className="p-8">Carregando...</div>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <div className="spinner mx-auto mb-4"></div>
+          <p className="text-gray-600 font-medium">Carregando locais...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Locais</h1>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          {showForm ? 'Cancelar' : 'Novo Local'}
-        </button>
+    <div className="max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">Locais</h1>
+            <p className="text-gray-600">Gerencie os locais de registro de presença</p>
+          </div>
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="btn-primary flex items-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            {showForm ? 'Cancelar' : 'Novo Local'}
+          </button>
+        </div>
       </div>
 
+      {/* Form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow mb-6">
-          <h2 className="text-xl font-semibold mb-4">{editingId ? 'Editar Local' : 'Novo Local'}</h2>
+        <div className="card mb-8 animate-fade-in">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            {editingId ? 'Editar Local' : 'Cadastrar Novo Local'}
+          </h2>
           
-          <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <label className="block text-sm font-medium mb-1">Nome</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Nome do Local</label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full border rounded px-3 py-2"
+                className="w-full"
+                placeholder="Ex: Escritório Central"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Raio (metros)</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Raio de Alcance (metros)</label>
               <input
                 type="number"
                 value={formData.radius_meters}
                 onChange={(e) => setFormData({ ...formData, radius_meters: e.target.value })}
-                className="w-full border rounded px-3 py-2"
+                className="w-full"
+                placeholder="100"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <label className="block text-sm font-medium mb-1">Latitude</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Latitude</label>
               <input
                 type="number"
                 step="any"
                 value={formData.latitude}
                 onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
-                className="w-full border rounded px-3 py-2"
+                className="w-full"
+                placeholder="-23.561414"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Longitude</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Longitude</label>
               <input
                 type="number"
                 step="any"
                 value={formData.longitude}
                 onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
-                className="w-full border rounded px-3 py-2"
+                className="w-full"
+                placeholder="-46.655881"
                 required
               />
             </div>
           </div>
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Endereco</label>
+          <div className="mb-6">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Endereço Completo</label>
             <input
               type="text"
               value={formData.address}
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              className="w-full border rounded px-3 py-2"
+              className="w-full"
+              placeholder="Rua, Número, Cidade - Estado"
             />
           </div>
 
-          <div className="mb-4">
-            <label className="flex items-center">
+          <div className="mb-6">
+            <label className="flex items-center cursor-pointer">
               <input
                 type="checkbox"
                 checked={formData.active}
                 onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
-                className="mr-2"
+                className="w-5 h-5 text-green-600 rounded focus:ring-green-500"
               />
-              <span className="text-sm">Ativo</span>
+              <span className="ml-3 text-sm font-medium text-gray-700">Local ativo e disponível para registros</span>
             </label>
           </div>
 
-          <div className="flex gap-2">
-            <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-              {editingId ? 'Atualizar' : 'Criar'}
+          <div className="flex gap-3">
+            <button
+              type="submit"
+              onClick={handleSubmit}
+              className="btn-primary"
+            >
+              {editingId ? 'Atualizar Local' : 'Cadastrar Local'}
             </button>
             <button
               type="button"
               onClick={resetForm}
-              className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400"
+              className="btn-secondary"
             >
               Cancelar
             </button>
           </div>
-        </form>
+        </div>
       )}
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Coordenadas</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Raio</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acoes</th>
-            </tr>
-          </thead>
-          <tbody>
-            {locations.map((location) => (
-              <tr key={location.id} className="border-t">
-                <td className="px-6 py-4">{location.name}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">
-                  {location.latitude}, {location.longitude}
-                </td>
-                <td className="px-6 py-4">{location.radius_meters}m</td>
-                <td className="px-6 py-4">
-                  <span className={`px-2 py-1 text-xs rounded ${location.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                    {location.active ? 'Ativo' : 'Inativo'}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <button
-                    onClick={() => handleEdit(location)}
-                    className="text-blue-600 hover:text-blue-800 mr-2"
-                  >
-                    Editar
-                  </button>
-                  <button
-                    onClick={() => handleDelete(location.id)}
-                    className="text-red-600 hover:text-red-800"
-                  >
-                    Excluir
-                  </button>
-                </td>
+      {/* Table */}
+      <div className="card overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr>
+                <th className="text-left">Nome</th>
+                <th className="text-left">Coordenadas</th>
+                <th className="text-left">Raio</th>
+                <th className="text-left">Endereço</th>
+                <th className="text-left">Status</th>
+                <th className="text-left">Ações</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {locations.map((location) => (
+                <tr key={location.id}>
+                  <td className="font-semibold text-gray-900">{location.name}</td>
+                  <td className="text-gray-600 font-mono text-sm">
+                    {location.latitude}, {location.longitude}
+                  </td>
+                  <td>
+                    <span className="badge badge-blue">{location.radius_meters}m</span>
+                  </td>
+                  <td className="text-gray-600 text-sm max-w-xs truncate">
+                    {location.address || 'Não informado'}
+                  </td>
+                  <td>
+                    {location.active ? (
+                      <span className="badge badge-green">Ativo</span>
+                    ) : (
+                      <span className="badge badge-red">Inativo</span>
+                    )}
+                  </td>
+                  <td>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEdit(location)}
+                        className="text-blue-600 hover:text-blue-800 p-2 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="Editar"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => handleDelete(location.id)}
+                        className="text-red-600 hover:text-red-800 p-2 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Excluir"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {locations.length === 0 && (
+          <div className="text-center py-12">
+            <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <p className="text-gray-500 font-medium">Nenhum local cadastrado</p>
+            <p className="text-gray-400 text-sm mt-1">Clique em "Novo Local" para cadastrar</p>
+          </div>
+        )}
       </div>
     </div>
   );
