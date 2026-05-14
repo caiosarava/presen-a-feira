@@ -1,22 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 
-interface AttendanceRecord {
-  id: string;
-  user_id: string;
-  check_in: string;
-  check_out: string | null;
-  location_id: string | null;
-  check_in_location?: { name: string };
-  status: 'present' | 'absent' | 'late';
-}
-
-interface UserProfile {
-  id: string;
-  full_name: string;
-  email: string;
-}
-
 export default function Attendance() {
   const [records, setRecords] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
