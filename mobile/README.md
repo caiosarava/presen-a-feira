@@ -1,102 +1,93 @@
-# Presenca Mobile - Registro de Ponto com Geolocalizacao
+# Presença Mobile - PWA
 
-Aplicativo mobile para registro de presenca (ponto) com validacao por geolocalizacao.
+Aplicativo mobile de controle de ponto com geolocalização, agora com suporte a PWA (Progressive Web App).
 
-## Funcionalidades
+## 🚀 Funcionalidades
 
-- [x] Login com email e senha
-- [x] Check-in e Check-out com validacao de localizacao
-- [x] Mapa mostrando a localizacao atual e o local permitido
-- [x] Calculo de distancia em tempo real
-- [x] Historico de registros
-- [x] Perfil do usuario
-- [x] Integracao com Supabase
+- ✅ **Check-in/Check-out** com geolocalização
+- ✅ **Validação de raio** de alcance do local
+- ✅ **Histórico** de registros
+- ✅ **Multi-lociais** de trabalho
+- ✅ **PWA** - Funciona em navegadores web
+- ✅ **Mobile First** - Otimizado para Android/iOS
 
-## Pre-requisitos
+## 📱 Como Usar
 
-- Node.js (v18 ou superior)
-- Expo CLI
-- Conta no Supabase
-- Dispositivo Android/iOS ou emulador
+### Mobile (Nativo - Android/iOS)
 
-## Instalacao
+1. Instale o **Expo Go** na sua loja de aplicativos
+2. Acesse o app e escaneie o QR Code do desenvolvimento
+3. Ou faça build nativo com `eas build`
 
-1. **Instale as dependencias:**
+### Web (PWA)
+
+1. Acesse `seusite.vercel.app/mobile`
+2. Para instalar:
+   - **Chrome/Edge**: Menu → "Adicionar à tela inicial"
+   - **Safari**: Compartilhar → "Adicionar à Tela de Início"
+
+## 🛠️ Desenvolvimento
+
 ```bash
-cd mobile
+# Instalar dependências
 npm install
-```
 
-2. **Configure o Supabase:**
-
-Crie um projeto em [supabase.com](https://supabase.com) e execute o SQL do arquivo `SETUP.md`
-
-3. **Configure as variaveis de ambiente:**
-
-Crie um arquivo `.env` na raiz do projeto:
-```bash
-cp .env.example .env
-```
-
-Edite o `.env` com suas credenciais:
-```env
-EXPO_PUBLIC_SUPABASE_URL=sua_url_aqui
-EXPO_PUBLIC_SUPABASE_ANON_KEY=sua_chave_aqui
-```
-
-4. **Inicie o aplicativo:**
-```bash
+# Iniciar desenvolvimento
 npm start
+
+# Rodar na web
+npm run web
+
+# Build para produção
+npm run build:web
 ```
 
-5. **Rode no seu dispositivo:**
-- Android: `npm run android` ou use o Expo Go
-- iOS: `npm run ios` ou use o Expo Go
+## 📦 Deploy (Vercel)
 
-## Estrutura do Projeto
+```bash
+# Instalar Vercel CLI
+npm install -g vercel
+
+# Fazer deploy
+vercel --prod
+```
+
+**Variáveis de Ambiente:**
+- `EXPO_PUBLIC_SUPABASE_URL`
+- `EXPO_PUBLIC_SUPABASE_ANON_KEY`
+
+## 📄 Estrutura
 
 ```
 mobile/
+├── public/              # Arquivos estáticos PWA
+│   ├── manifest.json    # Configuração PWA
+│   └── index.html       # HTML base
 ├── src/
-│   ├── screens/       # Telas do app
-│   │   ├── LoginScreen/
-│   │   ├── HomeScreen/
-│   │   ├── HistoryScreen/
-│   │   └── ProfileScreen/
-│   ├── services/      # Servicos (Supabase)
-│   ├── hooks/         # Hooks personalizados
-│   ├── utils/         # Funcoes utilitarias
-│   └── types/         # Types TypeScript
-├── assets/            # Imagens e icones
-├── App.tsx            # Ponto de entrada
-└── package.json
+│   ├── components/      # Componentes (MapView condicional)
+│   ├── screens/         # Telas (Home, History, Profile, Login)
+│   ├── hooks/           # Hooks (useLocation, useAuth)
+│   ├── services/        # Serviços (Supabase)
+│   └── utils/           # Utilitários
+├── App.tsx              # App principal
+├── app.json             # Configuração Expo
+└── package.json         # Dependências
 ```
 
-## Stack Tecnologico
+## 🔄 Diferenças Mobile vs Web
 
-- **React Native** - Framework mobile
-- **Expo** - Plataforma de desenvolvimento
-- **Supabase** - Backend as a Service
-- **TypeScript** - Tipagem estatica
-- **react-native-maps** - Mapas
-- **expo-location** - Geolocalizacao
-- **date-fns** - Formatacao de datas
+| Recurso | Mobile | Web |
+|---------|--------|-----|
+| Mapa | ✅ Nativo | ❌ Mensagem informativa |
+| Geolocalização | ✅ expo-location | ✅ navigator.geolocation |
+| Performance | ⚡ Ótima | ⚡ Boa |
+| Offline | ⚠️ Parcial | ⚠️ Parcial |
 
-## Regras de Negocio
+## 📖 Mais Informações
 
-1. **Geolocalizacao**: Usuario so registra presenca dentro do raio permitido (padrao: 100m)
-2. **Entrada/Saida**: Apenas 2 registros por dia (entrada e saida)
-3. **Validacao**: Distancia calculada via formula de Haversine
-4. **Registro livre**: Sem horario fixo, o usuario registra quando chega
+- [DEPLOY.md](./DEPLOY.md) - Guia completo de deploy
+- [README.md](../README.md) - Documentação geral do projeto
 
-## Próximos Passos
-
-- [ ] Criar painel admin (React + Vite)
-- [ ] Adicionar exportacao CSV
-- [ ] Implementar gestao de locais no admin
-- [ ] Implementar gestao de usuarios no admin
-- [ ] Adicionar foto no check-in (opcional)
-
-## Licenca
+## 📝 Licença
 
 MIT

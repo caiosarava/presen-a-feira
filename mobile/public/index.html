@@ -2,18 +2,38 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="theme-color" content="#2563EB" />
     <meta name="description" content="Aplicativo de controle de presenca com geolocalizacao" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Presenca" />
-    <link rel="manifest" href="/mobile/manifest.json" />
-    <link rel="icon" type="image/png" href="/mobile/favicon.png" />
-    <link rel="apple-touch-icon" href="/mobile/icons/icon-192.png" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    
+    <!-- Title -->
     <title>Presenca - Controle de Ponto</title>
+    
+    <!-- Preconnect to Supabase -->
+    <link rel="preconnect" href="https://rqlirjqyzggsifnpyeew.supabase.co" />
   </head>
   <body>
     <div id="root"></div>
+    
+    <!-- Service Worker (opcional) -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('SW registrado:', reg.scope))
+            .catch(err => console.log('SW falhou:', err));
+        });
+      }
+    </script>
   </body>
 </html>
