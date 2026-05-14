@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 
 interface Stats {
@@ -33,7 +33,7 @@ export default function Dashboard() {
         .gte('check_in', todayStart);
 
       const presentUsers = new Set(records?.map(r => r.user_id));
-      const uniqueRecords = records?.filter((r, i, arr) => 
+      const uniqueRecords = records?.filter((r, i, arr) =>
         arr.findIndex(x => x.user_id === r.user_id) === i
       );
 

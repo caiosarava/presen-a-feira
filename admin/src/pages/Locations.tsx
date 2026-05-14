@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { getLocations, createLocation, updateLocation, deleteLocation } from '../services/supabase';
-import { Location } from '../types';
+import type { Location } from '../types';
 
 export default function Locations() {
   const [locations, setLocations] = useState<Location[]>([]);

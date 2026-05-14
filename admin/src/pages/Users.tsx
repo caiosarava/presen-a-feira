@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { getUsers, updateUser } from '../services/supabase';
-import { Profile } from '../types';
+import type { Profile } from '../types';
 
 export default function Users() {
   const [users, setUsers] = useState<Profile[]>([]);

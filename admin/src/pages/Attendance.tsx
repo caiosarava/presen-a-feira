@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { getAttendanceRecords } from '../services/supabase';
 import Papa from 'papaparse';
-import { AttendanceRecord } from '../types';
+import type { AttendanceRecord } from '../types';
 
 export default function Attendance() {
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
