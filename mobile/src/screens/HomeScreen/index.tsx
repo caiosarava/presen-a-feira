@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, ScrollView } from 'react-native';
-import MapView, { Marker, Circle } from 'react-native-maps';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, ScrollView, Platform } from 'react-native';
+import MapView, { Marker, Circle } from '@/components/MapView';
 import { useLocation } from '@/hooks/useLocation';
 import { supabase, checkIn, checkOut, getActiveSession } from '@/services/supabase';
 import { calculateDistance, formatDistance } from '@/utils/distance';
@@ -63,41 +63,101 @@ export default function HomeScreen() {
     finally { setChecking(false); }
   };
 
-  if (locationLoading || loading) return <View style={styles.centerContainer}><ActivityIndicator size="large" color="#2563EB" /></View>;
+  if (locationLoading || loading) return (
+    <View style={styles.centerContainer}>
+      <ActivityIndicator size="large" color="#2563EB" />
+      <Text style={styles.loadingText}>Carregando...</Text>
+    </View>
+  );
 
   const isInsideRadius = distance !== null && selectedLocation && distance <= (selectedLocation.radius_meters || 100);
+  const isWeb = Platform.OS === 'web';
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={styles.title}>Presenca</Text>
-          <Text style={styles.date}>{new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}</Text>
+          <Text style={styles.date}>
+            {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
+          </Text>
         </View>
+
         {selectedLocation && (
           <View style={styles.mapContainer}>
-            <MapView style={styles.map} initialRegion={{ latitude: position?.latitude || selectedLocation.latitude, longitude: position?.longitude || selectedLocation.longitude, latitudeDelta: 0.01, longitudeDelta: 0.01 }} showsUserLocation followsUserLocation>
-              <Circle center={{ latitude: selectedLocation.latitude, longitude: selectedLocation.longitude }} radius={selectedLocation.radius_meters || 100} strokeColor="rgba(37, 99, 235, 0.3)" fillColor="rgba(37, 99, 235, 0.1)" />
-              <Marker coordinate={{ latitude: selectedLocation.latitude, longitude: selectedLocation.longitude }} title={selectedLocation.name} />
+            <MapView
+              style={styles.map}
+              initialRegion={{
+                latitude: position?.latitude || selectedLocation.latitude,
+                longitude: position?.longitude || selectedLocation.longitude,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              }}
+              showsUserLocation
+              followsUserLocation
+            >
+              <Circle
+                center={{ latitude: selectedLocation.latitude, longitude: selectedLocation.longitude }}
+                radius={selectedLocation.radius_meters || 100}
+                strokeColor="rgba(37, 99, 235, 0.3)"
+                fillColor="rgba(37, 99, 235, 0.1)"
+              />
+              <Marker
+                coordinate={{ latitude: selectedLocation.latitude, longitude: selectedLocation.longitude }}
+                title={selectedLocation.name}
+              />
             </MapView>
           </View>
         )}
+
         <View style={styles.infoCard}>
           <Text style={styles.infoLabel}>Local:</Text>
           <Text style={styles.infoValue}>{selectedLocation?.name || 'Carregando...'}</Text>
-          {distance !== null && (<>
-            <Text style={styles.infoLabel}>Distancia:</Text>
-            <Text style={[styles.infoValue, isInsideRadius ? styles.insideRadius : styles.outsideRadius]}>{formatDistance(distance)} {isInsideRadius ? '✓' : '✗'}</Text>
-          </>)}
-          {activeSession && (<>
-            <Text style={styles.infoLabel}>Check-in as:</Text>
-            <Text style={styles.infoValue}>{new Date(activeSession.check_in).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</Text>
-          </>)}
+          
+          {distance !== null && (
+            <>
+              <Text style={styles.infoLabel}>Distancia:</Text>
+              <Text style={[styles.infoValue, isInsideRadius ? styles.insideRadius : styles.outsideRadius]}>
+                {formatDistance(distance)} {isInsideRadius ? '✓' : '✗'}
+              </Text>
+            </>
+          )}
+
+          {activeSession && (
+            <>
+              <Text style={styles.infoLabel}>Check-in as:</Text>
+              <Text style={styles.infoValue}>
+                {new Date(activeSession.check_in).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+              </Text>
+            </>
+          )}
+
+          {isWeb && (
+            <View style={styles.webWarning}>
+              <Text style={styles.webWarningText}>
+                🌐 Para melhor experiencia, use um dispositivo movel
+              </Text>
+            </View>
+          )}
         </View>
-        <TouchableOpacity style={[styles.button, (!isInsideRadius || checking) && styles.buttonDisabled]} onPress={handleCheckAction} disabled={!isInsideRadius || checking}>
-          {checking ? <ActivityIndicator color="#FFF" /> : <Text style={styles.buttonText}>{activeSession ? 'Registrar Saida' : 'Registrar Entrada'}</Text>}
+
+        <TouchableOpacity
+          style={[styles.button, (!isInsideRadius || checking) && styles.buttonDisabled]}
+          onPress={handleCheckAction}
+          disabled={!isInsideRadius || checking}
+        >
+          {checking ? (
+            <ActivityIndicator color="#FFF" />
+          ) : (
+            <Text style={styles.buttonText}>
+              {activeSession ? 'Registrar Saida' : 'Registrar Entrada'}
+            </Text>
+          )}
         </TouchableOpacity>
-        {!isInsideRadius && <Text style={styles.warningText}>Aproxime-se para registrar</Text>}
+
+        {!isInsideRadius && (
+          <Text style={styles.warningText}>Aproxime-se para registrar</Text>
+        )}
       </View>
     </ScrollView>
   );
@@ -105,12 +165,14 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F3F4F6' },
+  scrollContent: { flexGrow: 1 },
   centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F3F4F6' },
-  content: { padding: 24 },
+  loadingText: { marginTop: 16, color: '#6B7280', fontSize: 16 },
+  content: { padding: Platform.OS === 'web' ? 16 : 24 },
   header: { marginBottom: 24 },
-  title: { fontSize: 28, fontWeight: 'bold', color: '#111827' },
+  title: { fontSize: Platform.OS === 'web' ? 24 : 28, fontWeight: 'bold', color: '#111827' },
   date: { fontSize: 16, color: '#6B7280', marginTop: 4, textTransform: 'capitalize' },
-  mapContainer: { height: 250, borderRadius: 16, overflow: 'hidden', marginBottom: 24 },
+  mapContainer: { height: Platform.OS === 'web' ? 300 : 250, borderRadius: 16, overflow: 'hidden', marginBottom: 24 },
   map: { width: '100%', height: '100%' },
   infoCard: { backgroundColor: '#FFF', borderRadius: 16, padding: 20, marginBottom: 24, elevation: 3 },
   infoLabel: { fontSize: 14, color: '#6B7280', marginBottom: 4 },
@@ -121,4 +183,6 @@ const styles = StyleSheet.create({
   buttonDisabled: { backgroundColor: '#93C5FD' },
   buttonText: { color: '#FFF', fontSize: 18, fontWeight: '600' },
   warningText: { textAlign: 'center', color: '#DC2626', fontSize: 14 },
+  webWarning: { backgroundColor: '#EFF6FF', padding: 12, borderRadius: 8, marginTop: 8 },
+  webWarningText: { color: '#2563EB', fontSize: 14, textAlign: 'center' },
 });
