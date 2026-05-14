@@ -100,7 +100,7 @@ export default function Locations() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div>
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
@@ -117,6 +117,51 @@ export default function Locations() {
             </svg>
             {showForm ? 'Cancelar' : 'Novo Local'}
           </button>
+        </div>
+      </div>
+
+      {/* Stats Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="card flex items-center gap-4">
+          <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </div>
+          <div>
+            <p className="text-xs font-bold text-on-surface-variant uppercase">Total de Locais</p>
+            <p className="text-2xl font-bold text-primary">{locations.length}</p>
+          </div>
+        </div>
+
+        <div className="card flex items-center gap-4">
+          <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center text-secondary">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <p className="text-xs font-bold text-on-surface-variant uppercase">Locais Ativos</p>
+            <p className="text-2xl font-bold text-secondary">{locations.filter(l => l.active).length}</p>
+          </div>
+        </div>
+
+        <div className="card flex items-center gap-4">
+          <div className="w-12 h-12 bg-tertiary/10 rounded-full flex items-center justify-center text-tertiary">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+            </svg>
+          </div>
+          <div>
+            <p className="text-xs font-bold text-on-surface-variant uppercase">Raio Médio</p>
+            <p className="text-2xl font-bold text-tertiary">
+              {locations.length > 0 
+                ? `${Math.round(locations.reduce((acc, l) => acc + l.radius_meters, 0) / locations.length)}m`
+                : '0m'
+              }
+            </p>
+          </div>
         </div>
       </div>
 
@@ -139,7 +184,7 @@ export default function Locations() {
           <h2 className="text-2xl font-bold text-primary mb-6">
             {editingId ? 'Editar Local' : 'Cadastrar Novo Local'}
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
               <label className="block text-sm font-semibold text-on-surface-variant mb-2">Nome do Local</label>
@@ -216,7 +261,7 @@ export default function Locations() {
 
           <div className="flex gap-3">
             <button
-              type="submit"
+              type="button"
               onClick={handleSubmit}
               className="btn-primary"
             >
@@ -234,45 +279,52 @@ export default function Locations() {
       )}
 
       {/* Table */}
-      <div className="card overflow-hidden">
+      <div className="card overflow-hidden p-0">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr>
-                <th className="text-left">Nome</th>
-                <th className="text-left">Coordenadas</th>
-                <th className="text-left">Raio</th>
-                <th className="text-left hidden md:table-cell">Endereço</th>
-                <th className="text-left">Status</th>
-                <th className="text-left">Ações</th>
+              <tr className="bg-surface-container">
+                <th className="text-left px-6 py-4">Nome</th>
+                <th className="text-left px-6 py-4">Coordenadas</th>
+                <th className="text-left px-6 py-4">Raio</th>
+                <th className="text-left px-6 py-4 hidden md:table-cell">Endereço</th>
+                <th className="text-left px-6 py-4">Status</th>
+                <th className="text-left px-6 py-4">Ações</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-outline-variant/30">
               {locations.map((location) => (
-                <tr key={location.id}>
-                  <td className="font-semibold text-primary">{location.name}</td>
-                  <td className="text-on-surface-variant font-mono text-sm">
+                <tr key={location.id} className="hover:bg-surface-container-lowest transition-colors">
+                  <td className="px-6 py-4">
+                    <span className="font-semibold text-primary">{location.name}</span>
+                  </td>
+                  <td className="px-6 py-4 text-on-surface-variant font-mono text-sm">
                     {location.latitude}, {location.longitude}
                   </td>
-                  <td>
+                  <td className="px-6 py-4">
                     <span className="badge badge-blue">{location.radius_meters}m</span>
                   </td>
-                  <td className="text-on-surface-variant text-sm hidden md:table-cell">
+                  <td className="px-6 py-4 text-on-surface-variant text-sm hidden md:table-cell">
                     {location.address || 'Não informado'}
                   </td>
-                  <td>
+                  <td className="px-6 py-4">
                     {location.active ? (
-                      <span className="badge badge-green flex items-center gap-1">
-                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-bold bg-secondary/10 text-secondary">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
                         Ativo
                       </span>
                     ) : (
-                      <span className="badge badge-red">Inativo</span>
+                      <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-bold bg-error/10 text-error">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                        </svg>
+                        Inativo
+                      </span>
                     )}
                   </td>
-                  <td>
+                  <td className="px-6 py-4">
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleEdit(location)}
@@ -299,6 +351,7 @@ export default function Locations() {
             </tbody>
           </table>
         </div>
+
         {locations.length === 0 && !error && (
           <div className="text-center py-12">
             <svg className="w-16 h-16 text-outline-variant mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
