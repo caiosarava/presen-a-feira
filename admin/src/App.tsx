@@ -8,36 +8,36 @@ import Users from './pages/Users';
 import Attendance from './pages/Attendance';
 import './index.css';
 
-// Icons as SVG components
+// Icons as SVG components - Com tamanho responsivo
 const Icons = {
   Dashboard: () => (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="w-5 h-5 max-w-[20px] max-h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
     </svg>
   ),
   Location: () => (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="w-5 h-5 max-w-[20px] max-h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
     </svg>
   ),
   Users: () => (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="w-5 h-5 max-w-[20px] max-h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
     </svg>
   ),
   Attendance: () => (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="w-5 h-5 max-w-[20px] max-h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
     </svg>
   ),
   Logout: () => (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="w-5 h-5 max-w-[20px] max-h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
     </svg>
   ),
   Menu: () => (
-    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="w-6 h-6 max-w-[24px] max-h-[24px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
     </svg>
   ),
@@ -96,21 +96,21 @@ function App() {
         {/* Navigation */}
         <nav className="bg-gradient-to-r from-green-700 via-green-600 to-teal-600 text-white shadow-lg sticky top-0 z-50">
           <div className="container mx-auto px-4">
-            <div className="flex justify-between items-center py-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex justify-between items-center py-3 md:py-4">
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-lg md:rounded-xl flex items-center justify-center backdrop-blur-sm flex-shrink-0">
+                  <svg className="w-4 h-4 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <div>
-                  <div className="text-xl font-bold tracking-tight">Presença</div>
-                  <div className="text-xs text-green-200 font-medium">Painel Administrativo</div>
+                <div className="min-w-0">
+                  <div className="text-base md:text-xl font-bold tracking-tight truncate">Presença</div>
+                  <div className="text-xs text-green-200 font-medium hidden md:block">Painel Administrativo</div>
                 </div>
               </div>
               
               {/* Desktop Menu */}
-              <div className="hidden md:flex items-center gap-2">
+              <div className="hidden md:flex items-center gap-1 md:gap-2">
                 <NavLink to="/">
                   <Icons.Dashboard />
                   <span>Dashboard</span>
@@ -129,16 +129,16 @@ function App() {
                 </NavLink>
                 <button
                   onClick={handleLogout}
-                  className="ml-4 flex items-center gap-2 bg-white/20 hover:bg-white/30 px-4 py-2.5 rounded-xl transition-all duration-200 backdrop-blur-sm font-medium"
+                  className="ml-2 md:ml-4 flex items-center gap-1 md:gap-2 bg-white/20 hover:bg-white/30 px-3 md:px-4 py-2 rounded-lg md:rounded-xl transition-all duration-200 backdrop-blur-sm font-medium text-sm md:text-base"
                 >
                   <Icons.Logout />
-                  <span>Sair</span>
+                  <span className="hidden lg:inline">Sair</span>
                 </button>
               </div>
 
               {/* Mobile menu button */}
               <button
-                className="md:hidden p-2"
+                className="md:hidden p-2 flex-shrink-0"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
                 <Icons.Menu />
@@ -158,7 +158,7 @@ function App() {
                       handleLogout();
                       setMobileMenuOpen(false);
                     }}
-                    className="text-left px-4 py-2.5 rounded-xl hover:bg-white/20 transition-all duration-200 font-medium"
+                    className="text-left px-4 py-2.5 rounded-xl hover:bg-white/20 transition-all duration-200 font-medium text-white"
                   >
                     Sair
                   </button>
@@ -169,7 +169,7 @@ function App() {
         </nav>
 
         {/* Content */}
-        <div className="container mx-auto px-4 py-8 animate-fade-in">
+        <div className="container mx-auto px-4 py-6 md:py-8 animate-fade-in">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/locations" element={<Locations />} />
@@ -189,7 +189,7 @@ function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
   return (
     <Link
       to={to}
-      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-200 font-medium ${
+      className={`flex items-center gap-1 md:gap-2 px-3 md:px-4 py-2 rounded-lg md:rounded-xl transition-all duration-200 font-medium text-sm md:text-base flex-shrink-0 ${
         isActive
           ? 'bg-white text-green-700 shadow-lg'
           : 'text-white hover:bg-white/20'

@@ -156,18 +156,20 @@ export default function Dashboard() {
 function StatCard({ title, value, icon, gradient, highlight = false }: any) {
   return (
     <div className={`card ${highlight ? 'ring-2 ring-green-500 ring-offset-2' : ''}`}>
-      <div className="flex items-center justify-between mb-4">
-        <div className={`w-14 h-14 bg-gradient-to-br ${gradient} rounded-xl flex items-center justify-center shadow-lg text-white`}>
-          {icon}
+      <div className="flex items-center justify-between mb-3 md:mb-4">
+        <div className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-br ${gradient} rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg text-white flex-shrink-0`}>
+          <div className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8">
+            {icon}
+          </div>
         </div>
         {highlight && (
-          <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+          <span className="px-2 py-0.5 sm:px-3 sm:py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full whitespace-nowrap">
             Atualizado
           </span>
         )}
       </div>
-      <div className="text-3xl font-bold text-gray-900 mb-1">{value}</div>
-      <div className="text-sm text-gray-600 font-medium">{title}</div>
+      <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{value}</div>
+      <div className="text-xs sm:text-sm text-gray-600 font-medium line-clamp-2">{title}</div>
     </div>
   );
 }
