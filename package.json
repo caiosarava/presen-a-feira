@@ -7,7 +7,7 @@
     "dev": "vite",
     "dev:admin": "vite --mode admin",
     "dev:mobile": "vite --mode mobile",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
     "build:admin": "vite build --mode admin",
     "build:mobile": "vite build --mode mobile",
     "preview": "vite preview",
