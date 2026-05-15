@@ -1,0 +1,32 @@
+{
+  "name": "presenca-unificado",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:admin": "vite --mode admin",
+    "dev:mobile": "vite --mode mobile",
+    "build": "tsc -b && vite build",
+    "build:admin": "vite build --mode admin",
+    "build:mobile": "vite build --mode mobile",
+    "preview": "vite preview",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-router-dom": "^7.6.2",
+    "@supabase/supabase-js": "^2.55.0",
+    "papaparse": "^5.5.3",
+    "date-fns": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/papaparse": "^5.3.15",
+    "@vitejs/plugin-react": "^4.3.0",
+    "typescript": "~5.9.2",
+    "vite": "^6.0.0"
+  }
+}
