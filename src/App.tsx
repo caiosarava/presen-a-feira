@@ -89,14 +89,14 @@ function App() {
           <Route
             path="/mobile/*"
             element={
-              user ? (
-                <MobileLayout user={user} handleLogout={handleLogout}>
-                  <Routes>
-                    <Route path="" element={<MobileHome />} />
-                    <Route path="history" element={<MobileHistory />} />
-                    <Route path="profile" element={<MobileProfile />} />
-                  </Routes>
-                </MobileLayout>
+user ? (
+<MobileLayout handleLogout={handleLogout}>
+<Routes>
+<Route path="" element={<MobileHome />} />
+<Route path="history" element={<MobileHistory />} />
+<Route path="profile" element={<MobileProfile />} />
+</Routes>
+</MobileLayout>
               ) : (
                 <Navigate to="/login/mobile" />
               )
@@ -244,64 +244,62 @@ function AdminLayout({ children, user, sidebarOpen, setSidebarOpen, handleLogout
 }
 
 // Mobile Layout Component
-function MobileLayout({ children, user, handleLogout }: any) {
-  const location = useLocation();
-  const isActive = (path: string) => location.pathname === path;
+function MobileLayout({ children, handleLogout }: { children: React.ReactNode; handleLogout: () => void }) {
+const location = useLocation();
+const isActive = (path: string) => location.pathname === path;
 
-  return (
-    <div className="min-h-screen bg-background">
-      {/* Top Bar */}
-      <header className="sticky top-0 bg-surface border-b border-outline-variant shadow-sm z-30">
-        <div className="flex justify-between items-center px-gutter py-md max-w-container-max mx-auto w-full">
-          <h1 className="font-headline-md text-headline-md text-primary font-bold">Precision Attendance</h1>
-          <button
-            onClick={handleLogout}
-            className="p-xs rounded-full hover:bg-surface-container transition-colors"
-          >
-            <span className="material-symbols-outlined text-on-surface-variant">logout</span>
-          </button>
-        </div>
-      </header>
+return (
+<div className="min-h-screen bg-background">
+<header className="sticky top-0 bg-surface border-b border-outline-variant shadow-sm z-30">
+<div className="flex justify-between items-center px-gutter py-md max-w-container-max mx-auto w-full">
+<h1 className="font-headline-md text-headline-md text-primary font-bold">Precision Attendance</h1>
+<button
+onClick={handleLogout}
+className="p-xs rounded-full hover:bg-surface-container transition-colors"
+type="button"
+>
+<span className="material-symbols-outlined text-on-surface-variant">logout</span>
+</button>
+</div>
+</header>
 
-      {/* Content */}
-      <div className="pb-20">
-        {children}
-      </div>
+<div className="pb-20">
+{children}
+</div>
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-surface-container border-t border-outline-variant shadow-lg z-50">
-        <div className="flex justify-around items-center py-sm max-w-container-md mx-auto">
-          <Link
-            to="/mobile"
-            className={`flex flex-col items-center gap-1 px-md py-xs rounded-lg transition-all ${
-              isActive('/mobile') ? 'text-primary' : 'text-on-surface-variant'
-            }`}
-          >
-            <span className="material-symbols-outlined">home</span>
-            <span className="font-label-bold text-label-bold text-xs">Início</span>
-          </Link>
-          <Link
-            to="/mobile/history"
-            className={`flex flex-col items-center gap-1 px-md py-xs rounded-lg transition-all ${
-              isActive('/mobile/history') ? 'text-primary' : 'text-on-surface-variant'
-            }`}
-          >
-            <span className="material-symbols-outlined">history</span>
-            <span className="font-label-bold text-label-bold text-xs">Histórico</span>
-          </Link>
-          <Link
-            to="/mobile/profile"
-            className={`flex flex-col items-center gap-1 px-md py-xs rounded-lg transition-all ${
-              isActive('/mobile/profile') ? 'text-primary' : 'text-on-surface-variant'
-            }`}
-          >
-            <span className="material-symbols-outlined">person</span>
-            <span className="font-label-bold text-label-bold text-xs">Perfil</span>
-          </Link>
-        </div>
-      </nav>
-    </div>
-  );
+<nav className="fixed bottom-0 left-0 right-0 bg-surface-container border-t border-outline-variant shadow-lg z-50">
+<div className="flex justify-around items-center py-sm max-w-container-md mx-auto">
+<Link
+to="/mobile"
+className={`flex flex-col items-center gap-1 px-md py-xs rounded-lg transition-all ${
+isActive('/mobile') ? 'text-primary' : 'text-on-surface-variant'
+}`}
+>
+<span className="material-symbols-outlined">home</span>
+<span className="font-label-bold text-label-bold text-xs">Início</span>
+</Link>
+<Link
+to="/mobile/history"
+className={`flex flex-col items-center gap-1 px-md py-xs rounded-lg transition-all ${
+isActive('/mobile/history') ? 'text-primary' : 'text-on-surface-variant'
+}`}
+>
+<span className="material-symbols-outlined">history</span>
+<span className="font-label-bold text-label-bold text-xs">Histórico</span>
+</Link>
+<Link
+to="/mobile/profile"
+className={`flex flex-col items-center gap-1 px-md py-xs rounded-lg transition-all ${
+isActive('/mobile/profile') ? 'text-primary' : 'text-on-surface-variant'
+}`}
+>
+<span className="material-symbols-outlined">person</span>
+<span className="font-label-bold text-label-bold text-xs">Perfil</span>
+</Link>
+</div>
+</nav>
+</div>
+);
 }
 
 function SidebarLink({ to, children, onClick }: { to: string; children: React.ReactNode; onClick?: () => void }) {

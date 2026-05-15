@@ -13,10 +13,9 @@ export default defineConfig({
       '@mobile': path.resolve(__dirname, './src/mobile'),
     },
   },
-  server: {
-    port: 5173,
-    historyApiFallback: true,
-  },
+server: {
+port: 5173,
+},
   build: {
     outDir: 'dist',
     sourcemap: true,

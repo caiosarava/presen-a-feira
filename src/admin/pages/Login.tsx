@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { signIn } from '../services/supabase';
+import { signIn } from '../../shared/services/supabase';
 
 interface LoginProps {
   onLogin: () => void;

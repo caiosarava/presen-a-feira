@@ -122,12 +122,46 @@ export const getAttendanceRecords = async (filters?: any) => {
 };
 
 export const updateAttendanceRecord = async (id: string, updates: any) => {
-  const { data, error } = await supabase
-    .from('attendance_records')
-    .update(updates)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) throw error;
-  return data;
+const { data, error } = await supabase
+.from('attendance_records')
+.update(updates)
+.eq('id', id)
+.select()
+.single();
+if (error) throw error;
+return data;
+};
+
+export const getActiveSession = async (userId: string) => {
+const { data, error } = await supabase
+.from('attendance_records')
+.select('*')
+.eq('user_id', userId)
+.is('check_out', null)
+.order('check_in', { ascending: false })
+.limit(1)
+.single();
+if (error) return null;
+return data;
+};
+
+export const checkIn = async (userId: string, locationId: string, latitude: number, longitude: number, distance: number) => {
+const { data, error } = await supabase
+.from('attendance_records')
+.insert({ user_id: userId, location_id: locationId, latitude, longitude, distance })
+.select()
+.single();
+if (error) throw error;
+return data;
+};
+
+export const checkOut = async (recordId: string, latitude: number, longitude: number) => {
+const { data, error } = await supabase
+.from('attendance_records')
+.update({ check_out: new Date().toISOString(), latitude, longitude })
+.eq('id', recordId)
+.select()
+.single();
+if (error) throw error;
+return data;
 };
