@@ -5,8 +5,7 @@
       "destination": "/index.html"
     }
   ],
-  "buildCommand": "npx vite build",
-  "outputDirectory": "dist",
-  "devCommand": "npx vite",
-  "installCommand": "npm install"
+  "installCommand": "npm install",
+  "buildCommand": "node --experimental-vm-modules node_modules/vite/bin/vite.js build",
+  "outputDirectory": "dist"
 }
